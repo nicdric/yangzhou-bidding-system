@@ -1013,6 +1013,11 @@
             }
         }
 
+        // 调试函数 - 查看当前用户数据
+        function debugUsers() {
+            console.log('当前用户数据:', getUsers());
+        }
+
         // 获取用户列表
         function getUsers() {
             return JSON.parse(localStorage.getItem('users') || '[]');
@@ -1117,7 +1122,11 @@
                 } else {
                     // 验证手机号用户
                     const users = getUsers();
+                    console.log('登录账号:', account);
+                    console.log('登录密码:', password);
+                    console.log('所有用户:', users);
                     const user = users.find(u => u.phone === account && u.password === password);
+                    console.log('找到用户:', user);
                     if (user) {
                         isValid = true;
                         userType = 'user';
