@@ -1034,23 +1034,28 @@
         function showWelcomeModal() {
             // 检查是否已经显示过（当前会话）
             if (!sessionStorage.getItem('welcomeModalShown')) {
-                document.getElementById('welcomeModal').style.display = 'block';
-                document.getElementById('modalOverlay').style.display = 'block';
-                sessionStorage.setItem('welcomeModalShown', 'true');
+                const modal = document.getElementById('welcomeModal');
+                const overlay = document.getElementById('modalOverlay');
+                if (modal && overlay) {
+                    modal.style.display = 'block';
+                    overlay.style.display = 'block';
+                    sessionStorage.setItem('welcomeModalShown', 'true');
+                }
             }
         }
 
         // 关闭欢迎弹窗
         function closeWelcomeModal() {
-            document.getElementById('welcomeModal').style.display = 'none';
-            document.getElementById('modalOverlay').style.display = 'none';
+            const modal = document.getElementById('welcomeModal');
+            const overlay = document.getElementById('modalOverlay');
+            if (modal) modal.style.display = 'none';
+            if (overlay) overlay.style.display = 'none';
         }
 
         // 点击遮罩层关闭弹窗
-        document.addEventListener('DOMContentLoaded', function() {
-            const overlay = document.getElementById('modalOverlay');
-            if (overlay) {
-                overlay.addEventListener('click', closeWelcomeModal);
+        document.addEventListener('click', function(e) {
+            if (e.target && e.target.id === 'modalOverlay') {
+                closeWelcomeModal();
             }
         });
 
