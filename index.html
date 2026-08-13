@@ -3,6 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 强制禁用浏览器缓存 -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <!-- 360浏览器兼容性 -->
+    <meta name="renderer" content="webkit">
+    <meta name="force-rendering" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <title>扬州招标信息采集系统</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -1085,6 +1093,49 @@
                 closeWelcomeModal();
             }
         });
+
+        // ========== 浏览器缓存清理机制 ==========
+        
+        // 检测360浏览器
+        function is360Browser() {
+            const ua = navigator.userAgent.toLowerCase();
+            return ua.indexOf('360') > -1 || ua.indexOf('qihu') > -1 || 
+                   ua.indexOf('360se') > -1 || ua.indexOf('360ee') > -1;
+        }
+        
+        // 获取浏览器信息
+        function getBrowserInfo() {
+            const ua = navigator.userAgent;
+            let browser = '未知浏览器';
+            
+            if (ua.indexOf('360SE') > -1) browser = '360安全浏览器';
+            else if (ua.indexOf('360EE') > -1) browser = '360极速浏览器';
+            else if (ua.indexOf('Edg') > -1) browser = 'Microsoft Edge';
+            else if (ua.indexOf('Chrome') > -1) browser = 'Chrome';
+            else if (ua.indexOf('Firefox') > -1) browser = 'Firefox';
+            else if (ua.indexOf('Safari') > -1) browser = 'Safari';
+            else if (ua.indexOf('MSIE') > -1 || ua.indexOf('Trident') > -1) browser = 'IE';
+            
+            return browser;
+        }
+        
+        // 页面加载时清理旧版本数据
+        (function cleanOldData() {
+            const CURRENT_VERSION = '20260813_v2.2';
+            const savedVersion = localStorage.getItem('system_version');
+            
+            // 如果版本不匹配，清理旧数据
+            if (savedVersion && savedVersion !== CURRENT_VERSION) {
+                console.log('检测到新版本，清理旧数据...');
+                localStorage.removeItem('users');
+                localStorage.removeItem('currentUser');
+                localStorage.removeItem('isLoggedIn');
+                console.log('旧数据已清理');
+            }
+            
+            // 保存当前版本号
+            localStorage.setItem('system_version', CURRENT_VERSION);
+        })();
 
         // 检查用户权限
         function checkPermission(username, permission) {
