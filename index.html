@@ -530,6 +530,37 @@
             border-radius: 6px;
             font-size: 13px;
         }
+        .permission-group {
+            margin-top: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+        .permission-group h5 {
+            margin-bottom: 12px;
+            font-size: 13px;
+            color: var(--text-primary);
+        }
+        .permission-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+        .permission-checkbox:last-child {
+            margin-bottom: 0;
+        }
+        .permission-checkbox input {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+        .permission-checkbox span {
+            font-size: 13px;
+            color: var(--text-primary);
+        }
         .form-actions {
             display: flex;
             gap: 10px;
@@ -780,7 +811,33 @@
                             </select>
                         </div>
                     </div>
-                    <div class="form-actions">
+                    
+                    <!-- 权限范围 -->
+                    <div class="permission-group">
+                        <h5>🔑 权限范围</h5>
+                        <label class="permission-checkbox">
+                            <input type="checkbox" id="permOverview" checked>
+                            <span>数据概览 - 查看统计数据</span>
+                        </label>
+                        <label class="permission-checkbox">
+                            <input type="checkbox" id="permBidding" checked>
+                            <span>招标信息 - 查看招标列表</span>
+                        </label>
+                        <label class="permission-checkbox">
+                            <input type="checkbox" id="permJiangsu" checked>
+                            <span>江苏工程招标 - 查看工程招标专栏</span>
+                        </label>
+                        <label class="permission-checkbox">
+                            <input type="checkbox" id="permSucai" checked>
+                            <span>苏采云 - 查看政府采购专栏</span>
+                        </label>
+                        <label class="permission-checkbox">
+                            <input type="checkbox" id="permManage">
+                            <span>权限管理 - 添加/编辑用户（仅管理员）</span>
+                        </label>
+                    </div>
+                    
+                    <div class="form-actions" style="margin-top: 15px;">
                         <button class="btn-secondary" onclick="clearAddForm()">取消</button>
                         <button class="btn-primary" onclick="addUser()">确认添加</button>
                     </div>
@@ -814,7 +871,8 @@
             if (users[username] && users[username].password === password) {
                 document.getElementById('loginForm').style.display = 'none';
                 document.getElementById('mainContainer').style.display = 'block';
-                document.getElementById('currentUser').textContent = username;
+                // 显示姓名而不是用户名
+                document.getElementById('currentUser').textContent = users[username].name;
                 errorMsg.style.display = 'none';
                 
                 // 初始化用户管理
@@ -1200,13 +1258,27 @@
                 const avatar = user.name.charAt(0);
                 const roleText = user.role === 'admin' ? '管理员' : '普通用户';
                 
+                // 显示权限范围
+                let permText = '';
+                if (user.permissions) {
+                    const perms = [];
+                    if (user.permissions.overview) perms.push('概览');
+                    if (user.permissions.bidding) perms.push('招标');
+                    if (user.permissions.jiangsu) perms.push('工程');
+                    if (user.permissions.sucai) perms.push('苏采云');
+                    if (user.permissions.manage) perms.push('管理');
+                    permText = perms.length > 0 ? perms.join('、') : '无权限';
+                } else {
+                    permText = '默认全部';
+                }
+                
                 html += `
                     <div class="user-item">
                         <div class="user-info">
                             <div class="user-avatar">${avatar}</div>
                             <div>
                                 <div style="font-weight: 600; font-size: 15px;">${user.name}</div>
-                                <div style="color: var(--text-secondary); font-size: 13px;">${username} · ${roleText}</div>
+                                <div style="color: var(--text-secondary); font-size: 13px;">${username} · ${roleText} · 权限：${permText}</div>
                             </div>
                         </div>
                         <div class="user-actions">
@@ -1236,16 +1308,32 @@
                 return;
             }
             
-            users[username] = { password, role, name };
+            // 获取权限设置
+            const permissions = {
+                overview: document.getElementById('permOverview').checked,
+                bidding: document.getElementById('permBidding').checked,
+                jiangsu: document.getElementById('permJiangsu').checked,
+                sucai: document.getElementById('permSucai').checked,
+                manage: document.getElementById('permManage').checked
+            };
+            
+            users[username] = { 
+                password, 
+                role, 
+                name,
+                permissions
+            };
             
             // 保存到 localStorage
             localStorage.setItem('users', JSON.stringify(users));
             
-            // 重新加载用户列表
-            loadUsers();
+            // 清空表单
             clearAddForm();
             
-            alert('用户添加成功！');
+            // 立即重新加载用户列表
+            loadUsers();
+            
+            alert('用户 "' + name + '" 添加成功！');
         }
 
         function editUser(username) {
@@ -1293,14 +1381,29 @@
             document.getElementById('newPassword').value = '';
             document.getElementById('newName').value = '';
             document.getElementById('newRole').value = 'user';
+            // 重置权限勾选
+            document.getElementById('permOverview').checked = true;
+            document.getElementById('permBidding').checked = true;
+            document.getElementById('permJiangsu').checked = true;
+            document.getElementById('permSucai').checked = true;
+            document.getElementById('permManage').checked = false;
         }
 
         // 初始化加载用户
         function initUsers() {
             const savedUsers = localStorage.getItem('users');
             if (savedUsers) {
-                const parsed = JSON.parse(savedUsers);
-                Object.assign(users, parsed);
+                try {
+                    const parsed = JSON.parse(savedUsers);
+                    // 合并用户数据
+                    Object.keys(parsed).forEach(key => {
+                        if (!users[key]) {
+                            users[key] = parsed[key];
+                        }
+                    });
+                } catch (e) {
+                    console.error('加载用户数据失败', e);
+                }
             }
             loadUsers();
         }
