@@ -446,6 +446,147 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         
+        /* 欢迎弹窗 */
+        .welcome-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 64, 152, 0.3);
+            z-index: 1000;
+            max-width: 420px;
+            width: 90%;
+            display: none;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: var(--bg-light);
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        .modal-close:hover {
+            background: var(--accent-color);
+            color: white;
+        }
+        .modal-body {
+            text-align: center;
+        }
+        /* 奔跑小人动画 */
+        .runner-animation {
+            width: 120px;
+            height: 80px;
+            margin: 20px auto;
+            position: relative;
+            overflow: hidden;
+        }
+        .runner {
+            position: absolute;
+            bottom: 0;
+            left: -30px;
+            animation: run 2s linear infinite;
+            font-size: 40px;
+        }
+        @keyframes run {
+            0% { left: -30px; }
+            100% { left: calc(100% + 30px); }
+        }
+        .runner-legs {
+            display: inline-block;
+            animation: legs 0.3s ease-in-out infinite alternate;
+        }
+        @keyframes legs {
+            0% { transform: rotate(-15deg); }
+            100% { transform: rotate(15deg); }
+        }
+        .ground-line {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(to right, transparent, var(--primary-color), transparent);
+        }
+        .dust-particle {
+            position: absolute;
+            bottom: 5px;
+            width: 4px;
+            height: 4px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            opacity: 0;
+            animation: dust 0.5s ease-out infinite;
+        }
+        .dust-particle:nth-child(2) { animation-delay: 0.1s; left: 30%; }
+        .dust-particle:nth-child(3) { animation-delay: 0.2s; left: 50%; }
+        .dust-particle:nth-child(4) { animation-delay: 0.3s; left: 70%; }
+        @keyframes dust {
+            0% { opacity: 0.8; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-20px); }
+        }
+        .modal-message {
+            font-size: 14px;
+            line-height: 1.8;
+            color: var(--text-primary);
+            margin: 15px 0;
+        }
+        .modal-highlight {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+        .modal-footer {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        .modal-btn {
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .modal-btn-primary {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+        }
+        .modal-btn-primary:hover {
+            background: var(--primary-light);
+        }
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 999;
+            display: none;
+        }
+        
         /* 权限管理 */
         .user-list { 
             background: white; 
@@ -637,6 +778,36 @@
 
     <!-- 主页面 -->
     <div class="main-container" id="mainContainer">
+        <!-- 欢迎弹窗 -->
+        <div class="modal-overlay" id="modalOverlay"></div>
+        <div class="welcome-modal" id="welcomeModal">
+            <div class="modal-header">
+                <div class="modal-title">📢 温馨提示</div>
+                <button class="modal-close" onclick="closeWelcomeModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="runner-animation">
+                    <div class="runner">
+                        <div class="runner-legs">🏃</div>
+                    </div>
+                    <div class="ground-line"></div>
+                    <div class="dust-particle"></div>
+                    <div class="dust-particle"></div>
+                    <div class="dust-particle"></div>
+                    <div class="dust-particle"></div>
+                </div>
+                <div class="modal-message">
+                    因资源来自<span class="modal-highlight">多源网站</span>，<br>
+                    我已在<span class="modal-highlight">加速收集</span>，<br>
+                    请稍等 <span class="modal-highlight">1-2 分钟</span>后查看，<br>
+                    也可手动点击 <span class="modal-highlight">“刷新数据”</span> 按钮。
+                </div>
+                <div class="modal-footer">
+                    <button class="modal-btn modal-btn-primary" onclick="closeWelcomeModal()">我知道了</button>
+                </div>
+            </div>
+        </div>
+        
         <div class="header">
             <div class="logo-area">
                 <div class="logo-icon">📋</div>
@@ -859,6 +1030,30 @@
         let lastUpdateTime = null;
         let currentUsername = null;
 
+        // 显示欢迎弹窗
+        function showWelcomeModal() {
+            // 检查是否已经显示过（当前会话）
+            if (!sessionStorage.getItem('welcomeModalShown')) {
+                document.getElementById('welcomeModal').style.display = 'block';
+                document.getElementById('modalOverlay').style.display = 'block';
+                sessionStorage.setItem('welcomeModalShown', 'true');
+            }
+        }
+
+        // 关闭欢迎弹窗
+        function closeWelcomeModal() {
+            document.getElementById('welcomeModal').style.display = 'none';
+            document.getElementById('modalOverlay').style.display = 'none';
+        }
+
+        // 点击遮罩层关闭弹窗
+        document.addEventListener('DOMContentLoaded', function() {
+            const overlay = document.getElementById('modalOverlay');
+            if (overlay) {
+                overlay.addEventListener('click', closeWelcomeModal);
+            }
+        });
+
         // 检查用户权限
         function checkPermission(username, permission) {
             const user = users[username];
@@ -915,6 +1110,9 @@
                 
                 // 应用权限控制
                 applyPermissions(username);
+                
+                // 显示欢迎弹窗
+                showWelcomeModal();
                 
                 // 重新加载用户列表
                 loadUsers();
@@ -1526,6 +1724,37 @@
             
             loadUsers();
         }
+
+        // 页面加载时检查登录状态
+        window.onload = function() {
+            // 初始化用户数据
+            initUsers();
+            
+            const isLoggedIn = localStorage.getItem('isLoggedIn');
+            const savedUsername = localStorage.getItem('currentUser');
+            
+            if (isLoggedIn === 'true' && savedUsername && users[savedUsername]) {
+                currentUsername = savedUsername;
+                // 自动登录
+                document.getElementById('loginForm').style.display = 'none';
+                document.getElementById('mainContainer').style.display = 'block';
+                document.getElementById('currentUser').textContent = users[savedUsername].name;
+                
+                // 应用权限控制
+                applyPermissions(savedUsername);
+                
+                // 显示欢迎弹窗
+                showWelcomeModal();
+                
+                // 加载用户列表
+                loadUsers();
+                
+                // 加载数据
+                loadYangzhouData();
+                loadJiangsuData();
+                loadSucaiData();
+            }
+        };
 
         document.getElementById('password').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') login();
