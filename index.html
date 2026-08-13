@@ -493,56 +493,78 @@
         .modal-body {
             text-align: center;
         }
-        /* 奔跑小人动画 */
-        .runner-animation {
-            width: 120px;
-            height: 80px;
-            margin: 20px auto;
-            position: relative;
-            overflow: hidden;
-        }
-        .runner {
-            position: absolute;
-            bottom: 0;
-            left: -30px;
-            animation: runForward 2s linear infinite;
-            font-size: 40px;
-        }
-        @keyframes runForward {
-            0% { left: -30px; }
-            100% { left: calc(100% + 30px); }
-        }
-        .runner-legs {
-            display: inline-block;
-            animation: legs 0.3s ease-in-out infinite alternate;
-        }
-        @keyframes legs {
-            0% { transform: rotate(-15deg); }
-            100% { transform: rotate(15deg); }
-        }
-        .ground-line {
-            position: absolute;
-            bottom: 0;
+        /* 进度条动画 */
+        .progress-animation {
             width: 100%;
-            height: 2px;
-            background: linear-gradient(to right, transparent, var(--primary-color), transparent);
+            max-width: 320px;
+            margin: 25px auto;
         }
-        .dust-particle {
+        .progress-bar-container {
+            background: var(--bg-light);
+            border-radius: 10px;
+            height: 24px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+            border-radius: 10px;
+            width: 0%;
+            animation: progressFill 3s ease-in-out infinite;
+            position: relative;
+        }
+        @keyframes progressFill {
+            0% { width: 0%; }
+            50% { width: 75%; }
+            100% { width: 100%; }
+        }
+        .progress-bar-shine {
             position: absolute;
-            bottom: 5px;
-            width: 4px;
-            height: 4px;
-            background: var(--primary-color);
-            border-radius: 50%;
-            opacity: 0;
-            animation: dust 0.5s ease-out infinite;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: progressShine 2s ease-in-out infinite;
         }
-        .dust-particle:nth-child(2) { animation-delay: 0.1s; left: 30%; }
-        .dust-particle:nth-child(3) { animation-delay: 0.2s; left: 50%; }
-        .dust-particle:nth-child(4) { animation-delay: 0.3s; left: 70%; }
-        @keyframes dust {
-            0% { opacity: 0.8; transform: translateY(0); }
-            100% { opacity: 0; transform: translateY(-20px); }
+        @keyframes progressShine {
+            0% { left: -100%; }
+            100% { left: 200%; }
+        }
+        .progress-dots {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 15px;
+        }
+        .progress-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            opacity: 0.3;
+            animation: dotPulse 1.4s ease-in-out infinite;
+        }
+        .progress-dot:nth-child(2) { animation-delay: 0.2s; }
+        .progress-dot:nth-child(3) { animation-delay: 0.4s; }
+        .progress-dot:nth-child(4) { animation-delay: 0.6s; }
+        .progress-dot:nth-child(5) { animation-delay: 0.8s; }
+        @keyframes dotPulse {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+        .progress-text {
+            text-align: center;
+            margin-top: 12px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            animation: textPulse 2s ease-in-out infinite;
+        }
+        @keyframes textPulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
         }
         .modal-message {
             font-size: 14px;
@@ -786,15 +808,20 @@
                 <button class="modal-close" onclick="closeWelcomeModal()">✕</button>
             </div>
             <div class="modal-body">
-                <div class="runner-animation">
-                    <div class="runner">
-                        <div class="runner-legs" style="display: inline-block; transform: scaleX(-1);">🏃</div>
+                <div class="progress-animation">
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill">
+                            <div class="progress-bar-shine"></div>
+                        </div>
                     </div>
-                    <div class="ground-line"></div>
-                    <div class="dust-particle"></div>
-                    <div class="dust-particle"></div>
-                    <div class="dust-particle"></div>
-                    <div class="dust-particle"></div>
+                    <div class="progress-text">正在加速收集数据...</div>
+                    <div class="progress-dots">
+                        <div class="progress-dot"></div>
+                        <div class="progress-dot"></div>
+                        <div class="progress-dot"></div>
+                        <div class="progress-dot"></div>
+                        <div class="progress-dot"></div>
+                    </div>
                 </div>
                 <div class="modal-message">
                     因资源来自<span class="modal-highlight">多源网站</span>，<br>
