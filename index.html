@@ -646,9 +646,9 @@
                 </div>
             </div>
             <div class="nav-tabs">
-                <button class="nav-tab active" onclick="showTab('overview')">📊 数据概览</button>
-                <button class="nav-tab" onclick="showTab('bidding')">📋 招标信息</button>
-                <button class="nav-tab" onclick="showTab('users')">👥 权限管理</button>
+                <button class="nav-tab active" id="navOverview" onclick="showTab('overview')">📊 数据概览</button>
+                <button class="nav-tab" id="navBidding" onclick="showTab('bidding')">📋 招标信息</button>
+                <button class="nav-tab" id="navUsers" onclick="showTab('users')">👥 权限管理</button>
                 <button class="logout-btn" onclick="logout()">退出登录</button>
             </div>
         </div>
@@ -699,7 +699,7 @@
                 <!-- 两个独立专栏 -->
                 <div class="columns-section">
                     <!-- 江苏省公共资源交易平台专栏 -->
-                    <div class="column-card">
+                    <div class="column-card" id="jiangsuColumnCard">
                         <div class="column-header">
                             <div class="column-title">
                                 <div class="column-icon">🏗️</div>
@@ -722,7 +722,7 @@
                     </div>
                     
                     <!-- 苏采云专栏 -->
-                    <div class="column-card">
+                    <div class="column-card" id="sucaiColumnCard">
                         <div class="column-header">
                             <div class="column-title">
                                 <div class="column-icon">☁️</div>
@@ -857,6 +857,41 @@
 
         let allData = [];
         let lastUpdateTime = null;
+        let currentUsername = null;
+
+        // 检查用户权限
+        function checkPermission(username, permission) {
+            const user = users[username];
+            if (!user) return false;
+            
+            // 管理员默认有所有权限
+            if (user.role === 'admin') return true;
+            
+            // 检查用户的具体权限
+            if (user.permissions && user.permissions[permission] !== undefined) {
+                return user.permissions[permission];
+            }
+            
+            // 默认权限（旧用户）
+            return permission !== 'manage';
+        }
+
+        // 根据权限显示/隐藏菜单和功能
+        function applyPermissions(username) {
+            const user = users[username];
+            if (!user) return;
+            
+            // 显示/隐藏导航按钮
+            document.getElementById('navOverview').style.display = checkPermission(username, 'overview') ? 'block' : 'none';
+            document.getElementById('navBidding').style.display = checkPermission(username, 'bidding') ? 'block' : 'none';
+            document.getElementById('navUsers').style.display = checkPermission(username, 'manage') ? 'block' : 'none';
+            
+            // 显示/隐藏专栏卡片
+            const jiangsuCard = document.getElementById('jiangsuColumnCard');
+            const sucaiCard = document.getElementById('sucaiColumnCard');
+            if (jiangsuCard) jiangsuCard.style.display = checkPermission(username, 'jiangsu') ? 'block' : 'none';
+            if (sucaiCard) sucaiCard.style.display = checkPermission(username, 'sucai') ? 'block' : 'none';
+        }
 
         function login() {
             const username = document.getElementById('username').value;
@@ -867,6 +902,7 @@
             initUsers();
             
             if (users[username] && users[username].password === password) {
+                currentUsername = username;
                 document.getElementById('loginForm').style.display = 'none';
                 document.getElementById('mainContainer').style.display = 'block';
                 // 显示姓名而不是用户名
@@ -876,6 +912,9 @@
                 // 保存登录状态到 localStorage
                 localStorage.setItem('currentUser', username);
                 localStorage.setItem('isLoggedIn', 'true');
+                
+                // 应用权限控制
+                applyPermissions(username);
                 
                 // 重新加载用户列表
                 loadUsers();
@@ -890,6 +929,7 @@
         }
 
         function logout() {
+            currentUsername = null;
             document.getElementById('loginForm').style.display = 'flex';
             document.getElementById('mainContainer').style.display = 'none';
             document.getElementById('username').value = '';
@@ -908,10 +948,14 @@
             const savedUsername = localStorage.getItem('currentUser');
             
             if (isLoggedIn === 'true' && savedUsername && users[savedUsername]) {
+                currentUsername = savedUsername;
                 // 自动登录
                 document.getElementById('loginForm').style.display = 'none';
                 document.getElementById('mainContainer').style.display = 'block';
                 document.getElementById('currentUser').textContent = users[savedUsername].name;
+                
+                // 应用权限控制
+                applyPermissions(savedUsername);
                 
                 // 加载用户列表
                 loadUsers();
@@ -1433,19 +1477,52 @@
                 }
             }
             
-            // 确保默认用户存在
+            // 确保默认用户存在，并添加默认权限
             if (!users['admin']) {
-                users['admin'] = { password: 'Aa112233*-', role: 'admin', name: '管理员' };
+                users['admin'] = { 
+                    password: 'Aa112233*-', 
+                    role: 'admin', 
+                    name: '管理员',
+                    permissions: { overview: true, bidding: true, jiangsu: true, sucai: true, manage: true }
+                };
             }
             if (!users['13812345678']) {
-                users['13812345678'] = { password: 'Test1234', role: 'user', name: '用户1' };
+                users['13812345678'] = { 
+                    password: 'Test1234', 
+                    role: 'user', 
+                    name: '用户1',
+                    permissions: { overview: true, bidding: true, jiangsu: true, sucai: true, manage: false }
+                };
             }
             if (!users['15998765432']) {
-                users['15998765432'] = { password: 'Yangzhou2026', role: 'user', name: '用户2' };
+                users['15998765432'] = { 
+                    password: 'Yangzhou2026', 
+                    role: 'user', 
+                    name: '用户2',
+                    permissions: { overview: true, bidding: true, jiangsu: true, sucai: true, manage: false }
+                };
             }
             if (!users['15150836006']) {
-                users['15150836006'] = { password: '1', role: 'user', name: '用户3' };
+                users['15150836006'] = { 
+                    password: '1', 
+                    role: 'user', 
+                    name: '用户3',
+                    permissions: { overview: true, bidding: true, jiangsu: true, sucai: true, manage: false }
+                };
             }
+            
+            // 为没有权限字段的旧用户添加默认权限
+            Object.keys(users).forEach(username => {
+                if (!users[username].permissions) {
+                    users[username].permissions = {
+                        overview: true,
+                        bidding: true,
+                        jiangsu: true,
+                        sucai: true,
+                        manage: users[username].role === 'admin'
+                    };
+                }
+            });
             
             loadUsers();
         }
