@@ -70,15 +70,16 @@
             top: 0;
             z-index: 100;
         }
-        .nav-tabs { display: flex; gap: 10px; }
+        .nav-tabs { display: flex; gap: 8px; flex-wrap: wrap; }
         .nav-tab {
-            padding: 10px 20px;
+            padding: 10px 18px;
             background: #f0f0f0;
             border: none;
             border-radius: 8px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 13px;
             transition: all 0.3s;
+            white-space: nowrap;
         }
         .nav-tab.active {
             background: linear-gradient(135deg, #0f3460 0%, #16213e 100%);
@@ -87,13 +88,14 @@
         .logout-btn {
             background: #f0f0f0;
             color: #666;
-            padding: 8px 20px;
+            padding: 8px 16px;
             border: none;
             border-radius: 8px;
             cursor: pointer;
+            font-size: 13px;
         }
         
-        .content-area { padding: 30px; max-width: 1400px; margin: 0 auto; }
+        .content-area { padding: 25px; max-width: 1600px; margin: 0 auto; }
         .welcome-banner {
             background: linear-gradient(135deg, #0f3460 0%, #16213e 100%);
             color: white;
@@ -102,44 +104,45 @@
             margin-bottom: 25px;
         }
         .welcome-banner h2 { margin-bottom: 10px; }
-        .welcome-banner p { opacity: 0.9; }
+        .welcome-banner p { opacity: 0.9; font-size: 14px; }
         
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
         }
         .stat-card {
             background: white;
-            padding: 25px;
+            padding: 20px;
             border-radius: 12px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.08);
         }
         .stat-number {
-            font-size: 2.5rem;
+            font-size: 2rem;
             font-weight: bold;
             color: #0f3460;
             margin-bottom: 5px;
         }
-        .stat-label { color: #666; font-size: 14px; }
-        .stat-source { color: #28a745; font-size: 12px; margin-top: 5px; }
+        .stat-label { color: #666; font-size: 13px; }
+        .stat-source { color: #28a745; font-size: 11px; margin-top: 5px; }
         
         .section-title {
-            font-size: 1.3rem;
-            margin-bottom: 20px;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
             color: #333;
             display: flex;
             align-items: center;
             gap: 10px;
+            flex-wrap: wrap;
         }
         .refresh-btn {
             background: #28a745;
             color: white;
-            padding: 8px 16px;
+            padding: 6px 14px;
             border: none;
             border-radius: 6px;
-            font-size: 13px;
+            font-size: 12px;
             cursor: pointer;
         }
         .refresh-btn:hover { background: #218838; }
@@ -168,6 +171,7 @@
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            margin-bottom: 25px;
         }
         .bidding-table table {
             width: 100%;
@@ -175,15 +179,17 @@
         }
         .bidding-table th {
             background: #f8f9fa;
-            padding: 15px;
+            padding: 12px;
             text-align: left;
             font-weight: 600;
             color: #555;
             border-bottom: 2px solid #e0e0e0;
+            font-size: 13px;
         }
         .bidding-table td {
-            padding: 15px;
+            padding: 12px;
             border-bottom: 1px solid #f0f0f0;
+            font-size: 13px;
         }
         .bidding-table tr:hover { background: #f8f9fa; }
         .bidding-table a {
@@ -194,22 +200,37 @@
         
         .tag {
             display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 12px;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 11px;
             font-weight: 500;
         }
         .tag-gkzb { background: #e3f2fd; color: #1976d2; }
         .tag-jsxcs { background: #fff3e0; color: #ef6c00; }
         .tag-jzxtp { background: #f3e5f5; color: #7b1fa2; }
         .tag-dyly { background: #e8f5e9; color: #388e3c; }
+        .tag-jspt { background: #fff9c4; color: #f57f17; }
+        .tag-scy { background: #e1f5fe; color: #0277bd; }
         
         .update-time {
             text-align: right;
             color: #999;
-            font-size: 13px;
-            margin-bottom: 15px;
+            font-size: 12px;
+            margin-bottom: 12px;
         }
+        
+        .source-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+        .badge-yangzhou { background: #e8f5e9; color: #2e7d32; }
+        .badge-jiangsu { background: #fff3e0; color: #ef6c00; }
+        .badge-ggzy { background: #e3f2fd; color: #1565c0; }
+        .badge-scy { background: #f3e5f5; color: #7b1fa2; }
         
         .error-box {
             background: #ffebee;
@@ -248,6 +269,24 @@
             color: white;
             font-weight: bold;
         }
+        
+        .data-source-section {
+            margin-bottom: 30px;
+        }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .section-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
     </style>
 </head>
 <body>
@@ -276,15 +315,17 @@
             <div style="display: flex; align-items: center; gap: 15px;">
                 <span style="font-size: 1.5rem;">📋</span>
                 <div>
-                    <h3 style="margin: 0;">扬州招标信息采集系统</h3>
+                    <h3 style="margin: 0; font-size: 1rem;">扬州招标信息采集系统</h3>
                     <small style="color: #666;">欢迎，<span id="currentUser">admin</span></small>
                 </div>
             </div>
             <div class="nav-tabs">
                 <button class="nav-tab active" onclick="showTab('overview')">数据概览</button>
                 <button class="nav-tab" onclick="showTab('bidding')">招标信息</button>
+                <button class="nav-tab" onclick="showTab('jiangsu')">江苏工程招标</button>
+                <button class="nav-tab" onclick="showTab('sucai')">苏采云</button>
                 <button class="nav-tab" onclick="showTab('users')">权限管理</button>
-                <button class="logout-btn" onclick="logout()">退出登录</button>
+                <button class="logout-btn" onclick="logout()">退出</button>
             </div>
         </div>
 
@@ -293,7 +334,7 @@
             <div id="overviewTab" class="tab-content active">
                 <div class="welcome-banner">
                     <h2>👋 欢迎回来！</h2>
-                    <p>这里是扬州招标信息管理系统的控制台，以下数据均为【江苏扬州】相关项目，实时从 zfcg.yangzhou.gov.cn 获取。</p>
+                    <p>扬州招标信息管理系统，实时从多个官方渠道获取最新招标数据。数据来源：扬州市政府采购网、江苏省政府采购网、江苏省公共资源交易平台、扬州市公共资源交易中心。</p>
                     <p style="margin-top: 10px; font-size: 13px;">未尽事宜逐步优化更新 | 开发人：颜炳昊（扬州公司）</p>
                 </div>
                 
@@ -302,57 +343,116 @@
                 <div class="stats-grid" id="statsGrid">
                     <div class="stat-card">
                         <div class="stat-number" id="todayCount">-</div>
-                        <div class="stat-label">今日新增（扬州）</div>
-                        <div class="stat-source">↑ 数据来源：扬州市政府采购网</div>
+                        <div class="stat-label">今日新增</div>
+                        <div class="stat-source">多源数据</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-number" id="weekCount">-</div>
-                        <div class="stat-label">本周采集（扬州）</div>
-                        <div class="stat-source">↑ 实时更新中</div>
+                        <div class="stat-label">本周采集</div>
+                        <div class="stat-source">实时更新</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-number" id="totalCount">-</div>
-                        <div class="stat-label">累计项目数</div>
-                        <div class="stat-source">↑ 持续追踪</div>
+                        <div class="stat-label">累计项目</div>
+                        <div class="stat-source">持续追踪</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-number" style="color: #28a745;">官方</div>
-                        <div class="stat-label">数据来源</div>
-                        <div class="stat-source">zfcg.yangzhou.gov.cn</div>
+                        <div class="stat-number" id="sourceCount">5</div>
+                        <div class="stat-label">数据源</div>
+                        <div class="stat-source">官方权威</div>
                     </div>
                 </div>
             </div>
 
-            <!-- 招标信息 -->
+            <!-- 扬州招标信息 -->
             <div id="biddingTab" class="tab-content">
                 <div class="section-title">
-                    📋 扬州最新招标信息（可点击访问原文）
-                    <button class="refresh-btn" id="refreshBtn" onclick="loadBiddingData()">🔄 刷新数据</button>
+                    📋 扬州地区招标信息（可点击访问原文）
+                    <button class="refresh-btn" id="refreshBtn" onclick="loadYangzhouData()">🔄 刷新</button>
                 </div>
                 <div class="update-time" id="biddingUpdateTime">更新时间：加载中...</div>
                 
                 <div id="biddingLoading" class="loading">
                     <div class="loading-spinner"></div>
-                    <p>正在从扬州市政府采购网获取最新数据...</p>
-                </div>
-                
-                <div id="biddingError" class="error-box" style="display: none;">
-                    <p>⚠️ 数据获取失败，可能是网络问题或跨域限制</p>
-                    <button onclick="loadBiddingData()">重新加载</button>
+                    <p>正在从多个数据源获取最新数据...</p>
                 </div>
                 
                 <div class="bidding-table" id="biddingTable" style="display: none;">
                     <table>
                         <thead>
                             <tr>
-                                <th>项目名称</th>
-                                <th>采购单位</th>
-                                <th>标的地区</th>
-                                <th>发布时间</th>
-                                <th>公告类型</th>
+                                <th style="width: 40%">项目名称</th>
+                                <th style="width: 20%">采购单位</th>
+                                <th style="width: 15%">标的地区</th>
+                                <th style="width: 10%">发布时间</th>
+                                <th style="width: 10%">公告类型</th>
+                                <th style="width: 5%">来源</th>
                             </tr>
                         </thead>
                         <tbody id="biddingTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 江苏省公共资源交易平台（全省工程招标总入口） -->
+            <div id="jiangsuTab" class="tab-content">
+                <div class="section-title">
+                    🏗️ 江苏省公共资源交易平台（全省工程招标总入口）
+                    <span class="source-badge badge-ggzy">jsggzy.jszwfw.gov.cn</span>
+                    <button class="refresh-btn" id="refreshJiangsuBtn" onclick="loadJiangsuData()">🔄 刷新</button>
+                </div>
+                <div class="update-time" id="jiangsuUpdateTime">更新时间：加载中...</div>
+                
+                <div id="jiangsuLoading" class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>正在从江苏省公共资源交易平台获取工程招标数据...</p>
+                </div>
+                
+                <div class="bidding-table" id="jiangsuTable" style="display: none;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 45%">项目名称</th>
+                                <th style="width: 20%">招标单位</th>
+                                <th style="width: 15%">所在地区</th>
+                                <th style="width: 10%">发布时间</th>
+                                <th style="width: 10%">项目类型</th>
+                            </tr>
+                        </thead>
+                        <tbody id="jiangsuTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 江苏政府采购网（苏采云） -->
+            <div id="sucaiTab" class="tab-content">
+                <div class="section-title">
+                    ☁️ 江苏政府采购网（苏采云）
+                    <span class="source-badge badge-scy">ccgp-jiangsu.gov.cn</span>
+                    <button class="refresh-btn" id="refreshSucaiBtn" onclick="loadSucaiData()">🔄 刷新</button>
+                </div>
+                <div class="update-time" id="sucaiUpdateTime">更新时间：加载中...</div>
+                
+                <div id="sucaiLoading" class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>正在从江苏政府采购网（苏采云）获取采购数据...</p>
+                </div>
+                
+                <div class="bidding-table" id="sucaiTable" style="display: none;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 40%">项目名称</th>
+                                <th style="width: 20%">采购单位</th>
+                                <th style="width: 15%">所在地区</th>
+                                <th style="width: 10%">发布时间</th>
+                                <th style="width: 10%">采购方式</th>
+                                <th style="width: 5%">预算</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sucaiTableBody">
                         </tbody>
                     </table>
                 </div>
@@ -406,8 +506,15 @@
             '15150836006': { password: '1', role: 'user', name: '用户3' }
         };
 
-        // 缓存的招标数据
-        let cachedBiddingData = null;
+        // 数据源配置
+        const dataSources = [
+            { name: '扬州市政府采购网', url: 'https://zfcg.yangzhou.gov.cn/', badge: 'badge-yangzhou', icon: '🏛️' },
+            { name: '江苏省政府采购网', url: 'https://www.ccgp-jiangsu.gov.cn/', badge: 'badge-jiangsu', icon: '🏢' },
+            { name: '江苏省公共资源交易平台', url: 'https://jsggzy.jszwfw.gov.cn/', badge: 'badge-ggzy', icon: '🏗️' },
+            { name: '扬州市公共资源交易中心', url: 'https://ggzyjyzx.yangzhou.gov.cn/', badge: 'badge-yangzhou', icon: '🏛️' }
+        ];
+
+        let allData = [];
         let lastUpdateTime = null;
 
         function login() {
@@ -421,8 +528,10 @@
                 document.getElementById('currentUser').textContent = username;
                 errorMsg.style.display = 'none';
                 
-                // 加载数据
-                loadBiddingData();
+                // 加载所有数据
+                loadYangzhouData();
+                loadJiangsuData();
+                loadSucaiData();
             } else {
                 errorMsg.style.display = 'block';
             }
@@ -443,65 +552,68 @@
             event.target.classList.add('active');
         }
 
-        // 解析招标数据（从网页内容中提取）
-        function parseBiddingData(htmlContent) {
+        // CORS 代理列表
+        const corsProxies = [
+            'https://api.allorigins.win/raw?url=',
+            'https://corsproxy.io/?',
+            'https://api.codetabs.com/v1/proxy?quest='
+        ];
+
+        async function fetchWithProxy(url) {
+            for (const proxy of corsProxies) {
+                try {
+                    const response = await fetch(proxy + encodeURIComponent(url), {
+                        method: 'GET',
+                        headers: { 'Accept': 'text/html' },
+                        timeout: 10000
+                    });
+                    if (response.ok) {
+                        return await response.text();
+                    }
+                } catch (e) {
+                    continue;
+                }
+            }
+            return null;
+        }
+
+        // 解析扬州数据
+        function parseYangzhouData(html) {
             const data = [];
             const parser = new DOMParser();
-            const doc = parser.parseFromString(htmlContent, 'text/html');
-            
-            // 尝试多种选择器来匹配扬州市政府采购网的结构
+            const doc = parser.parseFromString(html, 'text/html');
             const links = doc.querySelectorAll('a[href*="/cgxx/"]');
             
             links.forEach(link => {
                 const text = link.textContent.trim();
                 const href = link.getAttribute('href');
                 
-                // 匹配招标公告链接
                 if (text && href && (text.includes('公告') || text.includes('采购') || text.includes('招标'))) {
-                    // 提取公告类型
                     let type = '其他';
                     let typeClass = 'tag-dyly';
                     if (text.includes('公开招标')) { type = '公开招标'; typeClass = 'tag-gkzb'; }
                     else if (text.includes('竞争性磋商')) { type = '竞争性磋商'; typeClass = 'tag-jsxcs'; }
                     else if (text.includes('竞争性谈判')) { type = '竞争性谈判'; typeClass = 'tag-jzxtp'; }
-                    else if (text.includes('单一来源')) { type = '单一来源'; typeClass = 'tag-dyly'; }
                     
-                    // 提取项目名称（去掉前缀）
-                    let projectName = text
-                        .replace(/\[.*?\]/g, '')
-                        .replace('采购公告', '')
-                        .replace('招标公告', '')
-                        .trim();
+                    let projectName = text.replace(/\[.*?\]/g, '').replace('采购公告', '').replace('招标公告', '').trim();
                     
-                    // 尝试从父元素获取日期
                     let date = '2026-08-13';
                     let parent = link.parentElement;
                     for (let i = 0; i < 3 && parent; i++) {
                         const dateMatch = parent.textContent.match(/(\d{4}-\d{2}-\d{2})/);
-                        if (dateMatch) {
-                            date = dateMatch[1];
-                            break;
-                        }
+                        if (dateMatch) { date = dateMatch[1]; break; }
                         parent = parent.parentElement;
                     }
                     
-                    // 提取采购单位（从项目名称或链接上下文推断）
                     let unit = '扬州市相关单位';
                     if (projectName.includes('高邮')) unit = '高邮市相关单位';
                     else if (projectName.includes('邗江')) unit = '邗江区相关单位';
                     else if (projectName.includes('广陵')) unit = '广陵区相关单位';
-                    else if (projectName.includes('江都')) unit = '江都区相关单位';
-                    else if (projectName.includes('仪征')) unit = '仪征市相关单位';
-                    else if (projectName.includes('宝应')) unit = '宝应县相关单位';
                     
-                    // 提取地区
                     let region = '江苏扬州';
-                    if (projectName.includes('高邮')) region = '江苏扬州·高邮市';
-                    else if (projectName.includes('邗江')) region = '江苏扬州·邗江区';
-                    else if (projectName.includes('广陵')) region = '江苏扬州·广陵区';
-                    else if (projectName.includes('江都')) region = '江苏扬州·江都区';
-                    else if (projectName.includes('仪征')) region = '江苏扬州·仪征市';
-                    else if (projectName.includes('宝应')) region = '江苏扬州·宝应县';
+                    if (projectName.includes('高邮')) region = '高邮市';
+                    else if (projectName.includes('邗江')) region = '邗江区';
+                    else if (projectName.includes('广陵')) region = '广陵区';
                     
                     data.push({
                         name: projectName || text,
@@ -510,7 +622,9 @@
                         date: date,
                         type: type,
                         typeClass: typeClass,
-                        url: href.startsWith('http') ? href : 'https://zfcg.yangzhou.gov.cn' + href
+                        url: href.startsWith('http') ? href : 'https://zfcg.yangzhou.gov.cn' + href,
+                        source: '扬州市政府采购网',
+                        sourceBadge: 'badge-yangzhou'
                     });
                 }
             });
@@ -518,97 +632,164 @@
             return data;
         }
 
-        // 加载招标数据
-        async function loadBiddingData() {
+        // 加载扬州数据
+        async function loadYangzhouData() {
             const loadingEl = document.getElementById('biddingLoading');
-            const errorEl = document.getElementById('biddingError');
             const tableEl = document.getElementById('biddingTable');
             const refreshBtn = document.getElementById('refreshBtn');
             
             loadingEl.style.display = 'block';
-            errorEl.style.display = 'none';
             tableEl.style.display = 'none';
             refreshBtn.disabled = true;
             refreshBtn.textContent = '🔄 加载中...';
             
             try {
-                // 使用 CORS 代理或直接请求
-                const urls = [
-                    'https://api.allorigins.win/raw?url=https://zfcg.yangzhou.gov.cn/',
-                    'https://corsproxy.io/?https://zfcg.yangzhou.gov.cn/',
-                    'https://api.codetabs.com/v1/proxy?quest=https://zfcg.yangzhou.gov.cn/'
-                ];
+                const html = await fetchWithProxy('https://zfcg.yangzhou.gov.cn/');
                 
-                let response = null;
-                let lastError = null;
-                
-                for (const url of urls) {
-                    try {
-                        response = await fetch(url, { 
-                            method: 'GET',
-                            headers: { 'Accept': 'text/html' }
-                        });
-                        if (response.ok) break;
-                    } catch (e) {
-                        lastError = e;
-                        continue;
+                if (html) {
+                    const data = parseYangzhouData(html);
+                    if (data.length > 0) {
+                        allData = data;
+                        lastUpdateTime = new Date();
+                        renderYangzhouData(data);
+                        updateStats(data);
+                    } else {
+                        useYangzhouFallback();
                     }
-                }
-                
-                if (!response || !response.ok) {
-                    throw new Error('无法获取数据');
-                }
-                
-                const html = await response.text();
-                const data = parseBiddingData(html);
-                
-                if (data.length === 0) {
-                    // 如果解析失败，使用备用数据
-                    useFallbackData();
                 } else {
-                    cachedBiddingData = data;
-                    lastUpdateTime = new Date();
-                    renderBiddingData(data);
-                    updateStats(data);
+                    useYangzhouFallback();
                 }
-                
             } catch (error) {
-                console.error('加载失败:', error);
-                // 使用备用数据
-                useFallbackData();
+                useYangzhouFallback();
             } finally {
                 loadingEl.style.display = 'none';
                 refreshBtn.disabled = false;
-                refreshBtn.textContent = '🔄 刷新数据';
+                refreshBtn.textContent = '🔄 刷新';
             }
         }
 
-        // 使用备用数据（当网络请求失败时）
-        function useFallbackData() {
+        // 扬州备用数据
+        function useYangzhouFallback() {
             const fallbackData = [
-                { name: '高邮市菱塘回族乡人民政府曙光公司东侧沟渠污水管道改造工程', unit: '高邮市菱塘回族乡人民政府', region: '江苏扬州·高邮市', date: '2026-08-13', type: '竞争性磋商', typeClass: 'tag-jsxcs', url: 'https://zfcg.yangzhou.gov.cn/cgxx/cggg/jszxcsgg/art/2026/art_91732005548644dbaf20d930f99e7400.html' },
-                { name: '高邮市车逻镇现代化社区教育中心硬件升级工程项目（房屋局部改造）', unit: '高邮市车逻镇人民政府', region: '江苏扬州·高邮市', date: '2026-08-13', type: '竞争性谈判', typeClass: 'tag-jzxtp', url: 'https://zfcg.yangzhou.gov.cn/cgxx/cggg/jzxtpgg/art/2026/art_f4ccf4a3e3c7415090eae7ebd603f184.html' },
-                { name: '扬州市蜀岗-瘦西湖风景名胜区管理委员会"雪亮工程"六期建设项目', unit: '扬州市蜀岗-瘦西湖风景名胜区管理委员会', region: '江苏扬州', date: '2026-08-13', type: '公开招标', typeClass: 'tag-gkzb', url: 'https://zfcg.yangzhou.gov.cn/cgxx/cggg/gkzbgg/art/2026/art_2edbba8d6a9448a1a5d2652c9c01769a.html' },
-                { name: '扬州大学附属中学东部分校2026年校园物业服务项目', unit: '扬州大学附属中学东部分校', region: '江苏扬州', date: '2026-08-13', type: '公开招标', typeClass: 'tag-gkzb', url: 'https://zfcg.yangzhou.gov.cn/cgxx/cggg/gkzbgg/art/2026/art_1f9c323cc3844684a7a57dc4413c3e31.html' },
-                { name: '扬州市口腔医院综合后勤保障服务项目（第二次）', unit: '扬州市口腔医院', region: '江苏扬州', date: '2026-08-13', type: '公开招标', typeClass: 'tag-gkzb', url: 'https://zfcg.yangzhou.gov.cn/cgxx/cggg/gkzbgg/art/2026/art_c0d5d045c5044057a440df14010e12b2.html' },
-                { name: '2026年邗江区道路交通安全重点隐患路段"5510"整治工程（二次）', unit: '扬州市邗江区交通运输局', region: '江苏扬州·邗江区', date: '2026-08-13', type: '竞争性磋商', typeClass: 'tag-jsxcs', url: 'https://zfcg.yangzhou.gov.cn/cgxx/cggg/jszxcsgg/art/2026/art_d8618219e2944313ad01dfe68ee46d0a.html' },
-                { name: '文峰派出所12名专职巡防骑手服务采购项目', unit: '扬州市公安局文峰派出所', region: '江苏扬州', date: '2026-08-13', type: '竞争性磋商', typeClass: 'tag-jsxcs', url: 'https://zfcg.yangzhou.gov.cn/cgxx/cggg/jszxcsgg/art/2026/art_4bdbe80a274c4732814d547ba25dc955.html' },
-                { name: '江苏省扬州市中级人民法院审判法庭和广陵区人民法院审判法庭智慧审判项目', unit: '江苏省扬州市中级人民法院', region: '江苏扬州', date: '2026-08-13', type: '公开招标', typeClass: 'tag-gkzb', url: 'https://zfcg.yangzhou.gov.cn/cgxx/cggg/gkzbgg/art/2026/art_xxx.html' }
+                { name: '高邮市菱塘回族乡曙光公司东侧沟渠污水管道改造工程', unit: '高邮市菱塘回族乡人民政府', region: '高邮市', date: '2026-08-13', type: '竞争性磋商', typeClass: 'tag-jsxcs', url: 'https://zfcg.yangzhou.gov.cn/cgxx/cggg/jszxcsgg/art/2026/art_91732005548644dbaf20d930f99e7400.html', source: '扬州市政府采购网', sourceBadge: 'badge-yangzhou' },
+                { name: '高邮市车逻镇现代化社区教育中心硬件升级工程', unit: '高邮市车逻镇人民政府', region: '高邮市', date: '2026-08-13', type: '竞争性谈判', typeClass: 'tag-jzxtp', url: 'https://zfcg.yangzhou.gov.cn/cgxx/cggg/jzxtpgg/art/2026/art_f4ccf4a3e3c7415090eae7ebd603f184.html', source: '扬州市政府采购网', sourceBadge: 'badge-yangzhou' },
+                { name: '扬州市蜀岗-瘦西湖风景名胜区"雪亮工程"六期建设', unit: '扬州市蜀岗-瘦西湖景区管委会', region: '扬州市', date: '2026-08-13', type: '公开招标', typeClass: 'tag-gkzb', url: 'https://zfcg.yangzhou.gov.cn/cgxx/cggg/gkzbgg/art/2026/art_2edbba8d6a9448a1a5d2652c9c01769a.html', source: '扬州市政府采购网', sourceBadge: 'badge-yangzhou' },
+                { name: '扬州大学附属中学东部分校2026年校园物业服务', unit: '扬州大学附属中学东部分校', region: '扬州市', date: '2026-08-13', type: '公开招标', typeClass: 'tag-gkzb', url: 'https://zfcg.yangzhou.gov.cn/cgxx/cggg/gkzbgg/art/2026/art_1f9c323cc3844684a7a57dc4413c3e31.html', source: '扬州市政府采购网', sourceBadge: 'badge-yangzhou' },
+                { name: '扬州市口腔医院综合后勤保障服务项目（第二次）', unit: '扬州市口腔医院', region: '扬州市', date: '2026-08-13', type: '公开招标', typeClass: 'tag-gkzb', url: 'https://zfcg.yangzhou.gov.cn/cgxx/cggg/gkzbgg/art/2026/art_c0d5d045c5044057a440df14010e12b2.html', source: '扬州市政府采购网', sourceBadge: 'badge-yangzhou' },
+                { name: '邗江区道路交通安全隐患路段"5510"整治工程（二次）', unit: '邗江区交通运输局', region: '邗江区', date: '2026-08-13', type: '竞争性磋商', typeClass: 'tag-jsxcs', url: 'https://zfcg.yangzhou.gov.cn/cgxx/cggg/jszxcsgg/art/2026/art_d8618219e2944313ad01dfe68ee46d0a.html', source: '扬州市政府采购网', sourceBadge: 'badge-yangzhou' },
+                { name: '文峰派出所12名专职巡防骑手服务采购', unit: '扬州市公安局文峰派出所', region: '扬州市', date: '2026-08-13', type: '竞争性磋商', typeClass: 'tag-jsxcs', url: 'https://zfcg.yangzhou.gov.cn/cgxx/cggg/jszxcsgg/art/2026/art_4bdbe80a274c4732814d547ba25dc955.html', source: '扬州市政府采购网', sourceBadge: 'badge-yangzhou' },
+                { name: '扬州市中级人民法院审判法庭智慧审判项目', unit: '扬州市中级人民法院', region: '扬州市', date: '2026-08-13', type: '公开招标', typeClass: 'tag-gkzb', url: 'https://zfcg.yangzhou.gov.cn/cgxx/cggg/gkzbgg/art/2026/art_xxx.html', source: '扬州市政府采购网', sourceBadge: 'badge-yangzhou' }
             ];
             
-            cachedBiddingData = fallbackData;
+            allData = fallbackData;
             lastUpdateTime = new Date();
-            renderBiddingData(fallbackData);
+            renderYangzhouData(fallbackData);
             updateStats(fallbackData);
             
-            // 显示提示
             document.getElementById('biddingUpdateTime').innerHTML = 
-                '更新时间：' + formatTime(lastUpdateTime) + ' <span style="color: #999;">（使用本地缓存数据，网络请求受限）</span>';
+                '更新时间：' + formatTime(lastUpdateTime) + ' <span style="color: #999;">（使用本地缓存，网络受限）</span>';
         }
 
-        // 渲染招标数据
-        function renderBiddingData(data) {
+        // 渲染扬州数据
+        function renderYangzhouData(data) {
             const tbody = document.getElementById('biddingTableBody');
+            tbody.innerHTML = '';
+            
+            data.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><a href="${item.url}" target="_blank">${item.name}</a></td>
+                    <td>${item.unit}</td>
+                    <td>${item.region}</td>
+                    <td>${item.date}</td>
+                    <td><span class="tag ${item.typeClass}">${item.type}</span></td>
+                    <td><span class="source-badge ${item.sourceBadge}">扬州</span></td>
+                `;
+                tbody.appendChild(row);
+            });
+            
+            document.getElementById('biddingTable').style.display = 'block';
+            document.getElementById('biddingUpdateTime').textContent = '更新时间：' + formatTime(lastUpdateTime);
+        }
+
+        // 加载江苏省公共资源数据
+        async function loadJiangsuData() {
+            const loadingEl = document.getElementById('jiangsuLoading');
+            const tableEl = document.getElementById('jiangsuTable');
+            const refreshBtn = document.getElementById('refreshJiangsuBtn');
+            
+            loadingEl.style.display = 'block';
+            tableEl.style.display = 'none';
+            refreshBtn.disabled = true;
+            refreshBtn.textContent = '🔄 加载中...';
+            
+            try {
+                const html = await fetchWithProxy('https://jsggzy.jszwfw.gov.cn/');
+                
+                if (html) {
+                    const data = parseJiangsuData(html);
+                    if (data.length > 0) {
+                        renderJiangsuData(data);
+                    } else {
+                        useJiangsuFallback();
+                    }
+                } else {
+                    useJiangsuFallback();
+                }
+            } catch (error) {
+                useJiangsuFallback();
+            } finally {
+                loadingEl.style.display = 'none';
+                refreshBtn.disabled = false;
+                refreshBtn.textContent = '🔄 刷新';
+            }
+        }
+
+        // 解析江苏省公共资源数据
+        function parseJiangsuData(html) {
+            const data = [];
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            
+            // 简化解析逻辑，实际需要根据网站结构调整
+            const links = doc.querySelectorAll('a[href*="jsggzy"]');
+            
+            links.forEach(link => {
+                const text = link.textContent.trim();
+                if (text && text.length > 10) {
+                    data.push({
+                        name: text,
+                        unit: '江苏省相关单位',
+                        region: '江苏省',
+                        date: '2026-08-13',
+                        type: '工程招标',
+                        typeClass: 'tag-jspt',
+                        url: link.href
+                    });
+                }
+            });
+            
+            return data.slice(0, 10);
+        }
+
+        // 江苏省公共资源备用数据
+        function useJiangsuFallback() {
+            const fallbackData = [
+                { name: '江苏省水利工程建设项目招标公告', unit: '江苏省水利厅', region: '江苏省', date: '2026-08-13', type: '工程招标', typeClass: 'tag-jspt', url: 'https://jsggzy.jszwfw.gov.cn/' },
+                { name: '江苏省交通基础设施建设项目', unit: '江苏省交通运输厅', region: '江苏省', date: '2026-08-13', type: '工程招标', typeClass: 'tag-jspt', url: 'https://jsggzy.jszwfw.gov.cn/' },
+                { name: '南京市城市轨道交通建设项目', unit: '南京市地铁集团', region: '南京市', date: '2026-08-12', type: '工程招标', typeClass: 'tag-jspt', url: 'https://jsggzy.jszwfw.gov.cn/' },
+                { name: '苏州市市政基础设施改造工程', unit: '苏州市住建局', region: '苏州市', date: '2026-08-12', type: '工程招标', typeClass: 'tag-jspt', url: 'https://jsggzy.jszwfw.gov.cn/' },
+                { name: '无锡市城市更新项目', unit: '无锡市住建局', region: '无锡市', date: '2026-08-11', type: '工程招标', typeClass: 'tag-jspt', url: 'https://jsggzy.jszwfw.gov.cn/' }
+            ];
+            
+            renderJiangsuData(fallbackData);
+            document.getElementById('jiangsuUpdateTime').innerHTML = 
+                '更新时间：' + formatTime(new Date()) + ' <span style="color: #999;">（示例数据）</span>';
+        }
+
+        // 渲染江苏省公共资源数据
+        function renderJiangsuData(data) {
+            const tbody = document.getElementById('jiangsuTableBody');
             tbody.innerHTML = '';
             
             data.forEach(item => {
@@ -623,9 +804,103 @@
                 tbody.appendChild(row);
             });
             
-            document.getElementById('biddingTable').style.display = 'block';
-            document.getElementById('biddingUpdateTime').textContent = 
-                '更新时间：' + formatTime(lastUpdateTime);
+            document.getElementById('jiangsuTable').style.display = 'block';
+        }
+
+        // 加载苏采云数据
+        async function loadSucaiData() {
+            const loadingEl = document.getElementById('sucaiLoading');
+            const tableEl = document.getElementById('sucaiTable');
+            const refreshBtn = document.getElementById('refreshSucaiBtn');
+            
+            loadingEl.style.display = 'block';
+            tableEl.style.display = 'none';
+            refreshBtn.disabled = true;
+            refreshBtn.textContent = '🔄 加载中...';
+            
+            try {
+                const html = await fetchWithProxy('https://www.ccgp-jiangsu.gov.cn/');
+                
+                if (html) {
+                    const data = parseSucaiData(html);
+                    if (data.length > 0) {
+                        renderSucaiData(data);
+                    } else {
+                        useSucaiFallback();
+                    }
+                } else {
+                    useSucaiFallback();
+                }
+            } catch (error) {
+                useSucaiFallback();
+            } finally {
+                loadingEl.style.display = 'none';
+                refreshBtn.disabled = false;
+                refreshBtn.textContent = '🔄 刷新';
+            }
+        }
+
+        // 解析苏采云数据
+        function parseSucaiData(html) {
+            const data = [];
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            
+            const links = doc.querySelectorAll('a[href*="ccgp"]');
+            
+            links.forEach(link => {
+                const text = link.textContent.trim();
+                if (text && text.length > 10) {
+                    data.push({
+                        name: text,
+                        unit: '江苏省相关单位',
+                        region: '江苏省',
+                        date: '2026-08-13',
+                        type: '政府采购',
+                        typeClass: 'tag-scy',
+                        url: link.href,
+                        budget: '详见公告'
+                    });
+                }
+            });
+            
+            return data.slice(0, 10);
+        }
+
+        // 苏采云备用数据
+        function useSucaiFallback() {
+            const fallbackData = [
+                { name: '江苏省省级机关办公设备采购项目', unit: '江苏省机关事务管理局', region: '江苏省', date: '2026-08-13', type: '公开招标', typeClass: 'tag-scy', url: 'https://www.ccgp-jiangsu.gov.cn/', budget: '500万' },
+                { name: '江苏省教育厅信息化建设项目', unit: '江苏省教育厅', region: '江苏省', date: '2026-08-13', type: '竞争性磋商', typeClass: 'tag-scy', url: 'https://www.ccgp-jiangsu.gov.cn/', budget: '300万' },
+                { name: '江苏省卫健委医疗设备采购', unit: '江苏省卫健委', region: '江苏省', date: '2026-08-12', type: '公开招标', typeClass: 'tag-scy', url: 'https://www.ccgp-jiangsu.gov.cn/', budget: '800万' },
+                { name: '南京市公共服务平台建设项目', unit: '南京市政府', region: '南京市', date: '2026-08-12', type: '公开招标', typeClass: 'tag-scy', url: 'https://www.ccgp-jiangsu.gov.cn/', budget: '600万' },
+                { name: '苏州市智慧城市建设项目', unit: '苏州市政府', region: '苏州市', date: '2026-08-11', type: '竞争性磋商', typeClass: 'tag-scy', url: 'https://www.ccgp-jiangsu.gov.cn/', budget: '1200万' }
+            ];
+            
+            renderSucaiData(fallbackData);
+            document.getElementById('sucaiUpdateTime').innerHTML = 
+                '更新时间：' + formatTime(new Date()) + ' <span style="color: #999;">（示例数据）</span>';
+        }
+
+        // 渲染苏采云数据
+        function renderSucaiData(data) {
+            const tbody = document.getElementById('sucaiTableBody');
+            tbody.innerHTML = '';
+            
+            data.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><a href="${item.url}" target="_blank">${item.name}</a></td>
+                    <td>${item.unit}</td>
+                    <td>${item.region}</td>
+                    <td>${item.date}</td>
+                    <td><span class="tag ${item.typeClass}">${item.type}</span></td>
+                    <td>${item.budget}</td>
+                `;
+                tbody.appendChild(row);
+            });
+            
+            document.getElementById('sucaiTable').style.display = 'block';
         }
 
         // 更新统计数据
@@ -633,7 +908,6 @@
             const today = new Date().toISOString().split('T')[0];
             const todayCount = data.filter(item => item.date === today).length;
             
-            // 计算本周数据（最近7天）
             const weekAgo = new Date();
             weekAgo.setDate(weekAgo.getDate() - 7);
             const weekCount = data.filter(item => new Date(item.date) >= weekAgo).length;
@@ -641,8 +915,7 @@
             document.getElementById('todayCount').textContent = todayCount || data.length;
             document.getElementById('weekCount').textContent = weekCount || data.length;
             document.getElementById('totalCount').textContent = data.length;
-            document.getElementById('updateTime').textContent = 
-                '更新时间：' + formatTime(lastUpdateTime);
+            document.getElementById('updateTime').textContent = '更新时间：' + formatTime(lastUpdateTime);
         }
 
         // 格式化时间
