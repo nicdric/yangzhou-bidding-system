@@ -474,6 +474,91 @@
             font-weight: bold;
             font-size: 18px;
         }
+        .user-actions {
+            display: flex;
+            gap: 8px;
+        }
+        .action-btn {
+            padding: 6px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background: white;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+        .action-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+        .action-btn.delete:hover {
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+        }
+        .add-user-form {
+            background: var(--bg-light);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 2px dashed var(--border-color);
+        }
+        .add-user-form h4 {
+            margin-bottom: 15px;
+            color: var(--primary-color);
+            font-size: 15px;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .form-group-sm {
+            margin-bottom: 0;
+        }
+        .form-group-sm label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        .form-group-sm input, .form-group-sm select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 13px;
+        }
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        .btn-primary:hover {
+            background: var(--primary-light);
+        }
+        .btn-secondary {
+            background: white;
+            color: var(--text-secondary);
+            padding: 10px 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .btn-secondary:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
         
         /* 空状态 */
         .empty-state {
@@ -670,37 +755,40 @@
                     <div class="section-icon">👥</div>
                     权限管理
                 </div>
-                <div class="user-list">
-                    <div class="user-item">
-                        <div class="user-info">
-                            <div class="user-avatar">A</div>
-                            <div>
-                                <div style="font-weight: 600; font-size: 15px;">admin</div>
-                                <div style="color: var(--text-secondary); font-size: 13px;">超级管理员</div>
-                            </div>
+                
+                <!-- 添加用户表单 -->
+                <div class="add-user-form" id="addUserForm">
+                    <h4>➕ 添加新用户</h4>
+                    <div class="form-row">
+                        <div class="form-group-sm">
+                            <label>账户</label>
+                            <input type="text" id="newUsername" placeholder="手机号或用户名">
                         </div>
-                        <span class="tag tag-gkzb">已启用</span>
-                    </div>
-                    <div class="user-item">
-                        <div class="user-info">
-                            <div class="user-avatar">李</div>
-                            <div>
-                                <div style="font-weight: 600; font-size: 15px;">李经理</div>
-                                <div style="color: var(--text-secondary); font-size: 13px;">项目经理</div>
-                            </div>
+                        <div class="form-group-sm">
+                            <label>密码</label>
+                            <input type="password" id="newPassword" placeholder="设置密码">
                         </div>
-                        <span class="tag tag-gkzb">已启用</span>
-                    </div>
-                    <div class="user-item">
-                        <div class="user-info">
-                            <div class="user-avatar">王</div>
-                            <div>
-                                <div style="font-weight: 600; font-size: 15px;">王专员</div>
-                                <div style="color: var(--text-secondary); font-size: 13px;">数据录入员</div>
-                            </div>
+                        <div class="form-group-sm">
+                            <label>姓名</label>
+                            <input type="text" id="newName" placeholder="用户姓名">
                         </div>
-                        <span class="tag tag-gkzb">已启用</span>
+                        <div class="form-group-sm">
+                            <label>角色</label>
+                            <select id="newRole">
+                                <option value="user">普通用户</option>
+                                <option value="admin">管理员</option>
+                            </select>
+                        </div>
                     </div>
+                    <div class="form-actions">
+                        <button class="btn-secondary" onclick="clearAddForm()">取消</button>
+                        <button class="btn-primary" onclick="addUser()">确认添加</button>
+                    </div>
+                </div>
+                
+                <!-- 用户列表 -->
+                <div class="user-list" id="userList">
+                    <!-- 用户列表将由 JavaScript 动态生成 -->
                 </div>
             </div>
         </div>
@@ -728,6 +816,9 @@
                 document.getElementById('mainContainer').style.display = 'block';
                 document.getElementById('currentUser').textContent = username;
                 errorMsg.style.display = 'none';
+                
+                // 初始化用户管理
+                initUsers();
                 
                 // 加载所有数据
                 loadYangzhouData();
@@ -1097,6 +1188,121 @@
                    String(d.getDate()).padStart(2, '0') + ' ' +
                    String(d.getHours()).padStart(2, '0') + ':' +
                    String(d.getMinutes()).padStart(2, '0');
+        }
+
+        // 用户管理功能
+        function loadUsers() {
+            const userListEl = document.getElementById('userList');
+            let html = '';
+            
+            Object.keys(users).forEach((username, index) => {
+                const user = users[username];
+                const avatar = user.name.charAt(0);
+                const roleText = user.role === 'admin' ? '管理员' : '普通用户';
+                
+                html += `
+                    <div class="user-item">
+                        <div class="user-info">
+                            <div class="user-avatar">${avatar}</div>
+                            <div>
+                                <div style="font-weight: 600; font-size: 15px;">${user.name}</div>
+                                <div style="color: var(--text-secondary); font-size: 13px;">${username} · ${roleText}</div>
+                            </div>
+                        </div>
+                        <div class="user-actions">
+                            <button class="action-btn" onclick="editUser('${username}')">编辑</button>
+                            <button class="action-btn delete" onclick="deleteUser('${username}')">删除</button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            userListEl.innerHTML = html;
+        }
+
+        function addUser() {
+            const username = document.getElementById('newUsername').value.trim();
+            const password = document.getElementById('newPassword').value.trim();
+            const name = document.getElementById('newName').value.trim();
+            const role = document.getElementById('newRole').value;
+            
+            if (!username || !password || !name) {
+                alert('请填写完整信息！');
+                return;
+            }
+            
+            if (users[username]) {
+                alert('该账户已存在！');
+                return;
+            }
+            
+            users[username] = { password, role, name };
+            
+            // 保存到 localStorage
+            localStorage.setItem('users', JSON.stringify(users));
+            
+            // 重新加载用户列表
+            loadUsers();
+            clearAddForm();
+            
+            alert('用户添加成功！');
+        }
+
+        function editUser(username) {
+            const user = users[username];
+            if (!user) return;
+            
+            const newName = prompt('修改姓名：', user.name);
+            if (newName === null) return;
+            
+            const newRole = prompt('修改角色（admin/user）：', user.role);
+            if (newRole === null) return;
+            
+            const newPassword = prompt('修改密码（留空则不修改）：');
+            if (newPassword === null) return;
+            
+            user.name = newName || user.name;
+            user.role = (newRole === 'admin' || newRole === 'user') ? newRole : user.role;
+            if (newPassword.trim()) {
+                user.password = newPassword.trim();
+            }
+            
+            localStorage.setItem('users', JSON.stringify(users));
+            loadUsers();
+            alert('用户信息已更新！');
+        }
+
+        function deleteUser(username) {
+            if (username === 'admin') {
+                alert('不能删除管理员账户！');
+                return;
+            }
+            
+            if (!confirm(`确定要删除用户 "${users[username].name}" 吗？`)) {
+                return;
+            }
+            
+            delete users[username];
+            localStorage.setItem('users', JSON.stringify(users));
+            loadUsers();
+            alert('用户已删除！');
+        }
+
+        function clearAddForm() {
+            document.getElementById('newUsername').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('newName').value = '';
+            document.getElementById('newRole').value = 'user';
+        }
+
+        // 初始化加载用户
+        function initUsers() {
+            const savedUsers = localStorage.getItem('users');
+            if (savedUsers) {
+                const parsed = JSON.parse(savedUsers);
+                Object.assign(users, parsed);
+            }
+            loadUsers();
         }
 
         document.getElementById('password').addEventListener('keypress', function(e) {
