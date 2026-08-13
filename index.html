@@ -875,6 +875,10 @@
                 document.getElementById('currentUser').textContent = users[username].name;
                 errorMsg.style.display = 'none';
                 
+                // 保存登录状态到 localStorage
+                localStorage.setItem('currentUser', username);
+                localStorage.setItem('isLoggedIn', 'true');
+                
                 // 初始化用户管理
                 initUsers();
                 
@@ -892,7 +896,30 @@
             document.getElementById('mainContainer').style.display = 'none';
             document.getElementById('username').value = '';
             document.getElementById('password').value = '';
+            // 清除登录状态
+            localStorage.removeItem('currentUser');
+            localStorage.setItem('isLoggedIn', 'false');
         }
+
+        // 页面加载时检查登录状态
+        window.onload = function() {
+            initUsers(); // 先加载用户数据
+            
+            const isLoggedIn = localStorage.getItem('isLoggedIn');
+            const savedUsername = localStorage.getItem('currentUser');
+            
+            if (isLoggedIn === 'true' && savedUsername && users[savedUsername]) {
+                // 自动登录
+                document.getElementById('loginForm').style.display = 'none';
+                document.getElementById('mainContainer').style.display = 'block';
+                document.getElementById('currentUser').textContent = users[savedUsername].name;
+                
+                // 加载数据
+                loadYangzhouData();
+                loadJiangsuData();
+                loadSucaiData();
+            }
+        };
 
         function showTab(tabName) {
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
@@ -1395,15 +1422,16 @@
             if (savedUsers) {
                 try {
                     const parsed = JSON.parse(savedUsers);
-                    // 合并用户数据
-                    Object.keys(parsed).forEach(key => {
-                        if (!users[key]) {
-                            users[key] = parsed[key];
-                        }
-                    });
+                    // 清空当前 users 对象，然后加载所有保存的用户
+                    Object.keys(users).forEach(key => delete users[key]);
+                    Object.assign(users, parsed);
                 } catch (e) {
                     console.error('加载用户数据失败', e);
                 }
+            }
+            // 确保默认用户存在
+            if (!users['admin']) {
+                users['admin'] = { password: 'Aa112233*-', role: 'admin', name: '管理员' };
             }
             loadUsers();
         }
