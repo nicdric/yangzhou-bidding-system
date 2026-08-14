@@ -778,6 +778,109 @@
             text-decoration: underline;
         }
         
+        /* 历史招标项目板块 */
+        .history-section {
+            margin-top: 25px;
+            background: white;
+            border-radius: 12px;
+            padding: 20px 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border: 1px solid var(--border-color);
+        }
+        .history-count {
+            display: inline-block;
+            background: var(--primary-color);
+            color: white;
+            font-size: 12px;
+            padding: 2px 10px;
+            border-radius: 12px;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+        .history-list {
+            margin-top: 15px;
+            max-height: 420px;
+            overflow-y: auto;
+        }
+        .history-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 14px;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background 0.2s;
+        }
+        .history-item:hover {
+            background: #fafbff;
+        }
+        .history-item-main {
+            flex: 1;
+            min-width: 0;
+        }
+        .history-item-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+        .history-item-title:hover {
+            color: var(--primary-color);
+        }
+        .history-item-meta {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+        .history-item-meta span { margin-right: 14px; }
+        .history-item-side {
+            text-align: right;
+            flex-shrink: 0;
+            margin-left: 12px;
+        }
+        .history-item-date {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        .history-item-cat {
+            display: inline-block;
+            font-size: 11px;
+            padding: 1px 8px;
+            border-radius: 10px;
+            margin-top: 4px;
+        }
+        .cat-gov { background: #e6f0ff; color: var(--primary-color); }
+        .cat-construct { background: #fff2e6; color: #d4380d; }
+        .cat-other { background: #f6ffed; color: #389e0d; }
+        
+        /* 招标信息 子板块切换 */
+        .bidding-subtabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .bidding-subtab {
+            background: white;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            padding: 10px 22px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .bidding-subtab:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+        .bidding-subtab.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+        .bidding-subpanel { display: none; }
+        .bidding-subpanel.active { display: block; }
+        
         /* 空状态 */
         .empty-state {
             text-align: center;
@@ -968,6 +1071,25 @@
                     </div>
                 </div>
                 
+                <!-- 历史招标项目板块 -->
+                <div class="history-section">
+                    <div class="section-title">
+                        <div class="section-icon">📚</div>
+                        历史招标项目
+                        <span class="history-count" id="historyCount">0</span>
+                        <button class="refresh-btn" onclick="renderHistory()" style="margin-left: auto;">🔄 刷新</button>
+                    </div>
+                    <p style="font-size: 12px; color: var(--text-secondary); margin-top: 6px;">
+                        网页运行后采集的所有项目将永久保存在本地，按时间从新到旧排列。
+                    </p>
+                    <div class="history-list" id="historyList">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📭</div>
+                            <p>暂无历史项目，刷新各数据源后将自动采集</p>
+                        </div>
+                    </div>
+                </div>
+                
                 <div class="update-time" id="updateTime">最后更新时间：-</div>
             </div>
 
@@ -985,21 +1107,46 @@
                     <p>正在从多个数据源获取最新数据...</p>
                 </div>
                 
-                <div class="bidding-table" id="biddingTable" style="display: none;">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th style="width: 38%">项目名称</th>
-                                <th style="width: 18%">采购单位</th>
-                                <th style="width: 12%">标的地区</th>
-                                <th style="width: 10%">发布时间</th>
-                                <th style="width: 12%">公告类型</th>
-                                <th style="width: 10%">数据来源</th>
-                            </tr>
-                        </thead>
-                        <tbody id="biddingTableBody">
-                        </tbody>
-                    </table>
+                <!-- 招标信息子板块：政府采购 / 建设工程 -->
+                <div class="bidding-subtabs">
+                    <button class="bidding-subtab active" id="subGovBtn" onclick="showBiddingSub('gov')">🏛️ 政府采购</button>
+                    <button class="bidding-subtab" id="subConstructBtn" onclick="showBiddingSub('construct')">🏗️ 建设工程</button>
+                </div>
+                
+                <div id="biddingGovPanel" class="bidding-subpanel active">
+                    <div class="bidding-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width: 38%">项目名称</th>
+                                    <th style="width: 18%">采购单位</th>
+                                    <th style="width: 12%">标的地区</th>
+                                    <th style="width: 10%">发布时间</th>
+                                    <th style="width: 12%">公告类型</th>
+                                    <th style="width: 10%">数据来源</th>
+                                </tr>
+                            </thead>
+                            <tbody id="biddingGovBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div id="biddingConstructPanel" class="bidding-subpanel">
+                    <div class="bidding-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width: 38%">项目名称</th>
+                                    <th style="width: 18%">采购单位</th>
+                                    <th style="width: 12%">标的地区</th>
+                                    <th style="width: 10%">发布时间</th>
+                                    <th style="width: 12%">公告类型</th>
+                                    <th style="width: 10%">数据来源</th>
+                                </tr>
+                            </thead>
+                            <tbody id="biddingConstructBody"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
@@ -1235,6 +1382,9 @@
                 loadYangzhouData();
                 loadJiangsuData();
                 loadSucaiData();
+                // 渲染历史与统计（基于已采集数据）
+                renderHistory();
+                updateStatsFromHistory();
             } else {
                 errorMsg.style.display = 'block';
             }
@@ -1417,10 +1567,15 @@
         }
 
         function renderYangzhouData(data) {
-            const tbody = document.getElementById('biddingTableBody');
-            tbody.innerHTML = '';
-            
+            const govBody = document.getElementById('biddingGovBody');
+            const constructBody = document.getElementById('biddingConstructBody');
+            if (govBody) govBody.innerHTML = '';
+            if (constructBody) constructBody.innerHTML = '';
+            if (!govBody || !constructBody) return;
+
+            let govCount = 0, constructCount = 0;
             data.forEach(item => {
+                const cat = classifyBid(item);
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td><a href="${item.url}" target="_blank">${item.name}</a></td>
@@ -1430,11 +1585,34 @@
                     <td><span class="tag ${item.typeClass}">${item.type}</span></td>
                     <td><span class="source-badge badge-yangzhou">${item.source}</span></td>
                 `;
-                tbody.appendChild(row);
+                if (cat === 'construct') { constructBody.appendChild(row); constructCount++; }
+                else { govBody.appendChild(row); govCount++; }
             });
-            
-            document.getElementById('biddingTable').style.display = 'block';
+
+            if (govCount === 0) govBody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:#999;">暂无政府采购类项目</td></tr>';
+            if (constructCount === 0) constructBody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:#999;">暂无建设工程类项目</td></tr>';
+
             document.getElementById('biddingUpdateTime').textContent = '更新时间：' + formatTime(lastUpdateTime);
+        }
+
+        // 招标信息子板块切换
+        function showBiddingSub(type) {
+            const govPanel = document.getElementById('biddingGovPanel');
+            const conPanel = document.getElementById('biddingConstructPanel');
+            const govBtn = document.getElementById('subGovBtn');
+            const conBtn = document.getElementById('subConstructBtn');
+            if (!govPanel || !conPanel) return;
+            if (type === 'gov') {
+                govPanel.classList.add('active');
+                conPanel.classList.remove('active');
+                if (govBtn) govBtn.classList.add('active');
+                if (conBtn) conBtn.classList.remove('active');
+            } else {
+                conPanel.classList.add('active');
+                govPanel.classList.remove('active');
+                if (conBtn) conBtn.classList.add('active');
+                if (govBtn) govBtn.classList.remove('active');
+            }
         }
 
         // 江苏省公共资源数据
@@ -1454,6 +1632,9 @@
                     const data = parseJiangsuData(html);
                     if (data.length > 0) {
                         renderJiangsuColumn(data);
+                        addToHistory(data);
+                        updateStatsFromHistory();
+                        renderHistory();
                     } else {
                         useJiangsuFallback();
                     }
@@ -1502,6 +1683,9 @@
             ];
             
             renderJiangsuColumn(fallbackData);
+            addToHistory(fallbackData);
+            updateStatsFromHistory();
+            renderHistory();
         }
 
         function renderJiangsuColumn(data) {
@@ -1540,6 +1724,9 @@
                     const data = parseSucaiData(html);
                     if (data.length > 0) {
                         renderSucaiColumn(data);
+                        addToHistory(data);
+                        updateStatsFromHistory();
+                        renderHistory();
                     } else {
                         useSucaiFallback();
                     }
@@ -1588,6 +1775,9 @@
             ];
             
             renderSucaiColumn(fallbackData);
+            addToHistory(fallbackData);
+            updateStatsFromHistory();
+            renderHistory();
         }
 
         function renderSucaiColumn(data) {
@@ -1609,18 +1799,133 @@
             contentEl.innerHTML = html;
         }
 
+        // ========== 招标项目分类（政府采购 / 建设工程） ==========
+        function classifyBid(item) {
+            const name = (item.name || '');
+            const type = (item.type || '');
+            // 基建工程类 -> 建设工程
+            if (name.indexOf('工程') > -1 || type === '工程招标' || name.indexOf('基建') > -1) {
+                return 'construct';
+            }
+            // 保险、服务及其他采购类 -> 政府采购
+            return 'gov';
+        }
+
+        // ========== 历史招标项目（永久保存在本地） ==========
+        function addToHistory(items) {
+            if (!items || !items.length) return;
+            let history = [];
+            try { history = JSON.parse(localStorage.getItem('bidding_history') || '[]'); } catch (e) { history = []; }
+            const keys = new Set(history.map(h => h.url || h.name));
+            const now = new Date().toISOString();
+            items.forEach(item => {
+                const key = item.url || item.name;
+                if (!keys.has(key)) {
+                    history.push({
+                        name: item.name,
+                        unit: item.unit,
+                        region: item.region,
+                        date: item.date,
+                        type: item.type,
+                        url: item.url,
+                        source: item.source,
+                        collectedAt: now
+                    });
+                    keys.add(key);
+                }
+            });
+            try { localStorage.setItem('bidding_history', JSON.stringify(history)); } catch (e) {}
+        }
+
+        function renderHistory() {
+            const listEl = document.getElementById('historyList');
+            const countEl = document.getElementById('historyCount');
+            if (!listEl) return;
+            let history = [];
+            try { history = JSON.parse(localStorage.getItem('bidding_history') || '[]'); } catch (e) { history = []; }
+
+            // 按采集时间从新到旧排列
+            history.sort((a, b) => new Date(b.collectedAt) - new Date(a.collectedAt));
+            if (countEl) countEl.textContent = history.length;
+
+            if (history.length === 0) {
+                listEl.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📭</div><p>暂无历史项目，刷新各数据源后将自动采集</p></div>';
+                return;
+            }
+
+            let html = '';
+            history.forEach(item => {
+                const cat = classifyBid(item);
+                let catClass = 'cat-other', catText = '其他';
+                if (cat === 'construct') { catClass = 'cat-construct'; catText = '建设工程'; }
+                else { catClass = 'cat-gov'; catText = '政府采购'; }
+                const collected = item.collectedAt ? formatTime(item.collectedAt) : '';
+                html += `
+                    <div class="history-item">
+                        <div class="history-item-main">
+                            <a href="${item.url || '#'}" target="_blank" class="history-item-title">${item.name}</a>
+                            <div class="history-item-meta">
+                                <span>🏢 ${item.unit || '-'}</span>
+                                <span>📍 ${item.region || '-'}</span>
+                                <span>📅 发布 ${item.date || '-'}</span>
+                                <span>🔗 ${item.source || '-'}</span>
+                            </div>
+                        </div>
+                        <div class="history-item-side">
+                            <div class="history-item-date">采集 ${collected}</div>
+                            <span class="history-item-cat ${catClass}">${catText}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            listEl.innerHTML = html;
+        }
+
+        // ========== 统计：今日 / 本周 / 本年（按实际日期） ==========
+        function getWeekRange() {
+            const now = new Date();
+            const day = now.getDay(); // 0=周日 1=周一 ... 6=周六
+            const diffToMonday = (day === 0 ? -6 : 1 - day);
+            const monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() + diffToMonday);
+            monday.setHours(0, 0, 0, 0);
+            const sunday = new Date(monday);
+            sunday.setDate(monday.getDate() + 7);
+            return { start: monday, end: sunday };
+        }
+
+        function updateStatsFromHistory() {
+            let history = [];
+            try { history = JSON.parse(localStorage.getItem('bidding_history') || '[]'); } catch (e) { history = []; }
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const { start: weekStart, end: weekEnd } = getWeekRange();
+            const thisYear = now.getFullYear();
+
+            let todayCount = 0, weekCount = 0, yearCount = 0;
+            history.forEach(item => {
+                if (!item.date) return;
+                const d = new Date(item.date + 'T00:00:00');
+                if (isNaN(d.getTime())) return;
+                if (d >= today) todayCount++;
+                if (d >= weekStart && d < weekEnd) weekCount++;
+                if (d.getFullYear() === thisYear) yearCount++;
+            });
+
+            const todayEl = document.getElementById('todayCount');
+            const weekEl = document.getElementById('weekCount');
+            const totalEl = document.getElementById('totalCount');
+            if (todayEl) todayEl.textContent = todayCount;
+            if (weekEl) weekEl.textContent = weekCount;
+            if (totalEl) totalEl.textContent = yearCount;
+        }
+
+        // 兼容旧调用：采集入库并更新统计
         function updateStats(data) {
-            const today = new Date().toISOString().split('T')[0];
-            const todayCount = data.filter(item => item.date === today).length;
-            
-            const weekAgo = new Date();
-            weekAgo.setDate(weekAgo.getDate() - 7);
-            const weekCount = data.filter(item => new Date(item.date) >= weekAgo).length;
-            
-            document.getElementById('todayCount').textContent = todayCount || data.length;
-            document.getElementById('weekCount').textContent = weekCount || data.length;
-            document.getElementById('totalCount').textContent = data.length;
-            document.getElementById('updateTime').textContent = '最后更新时间：' + formatTime(lastUpdateTime);
+            addToHistory(data);
+            updateStatsFromHistory();
+            renderHistory();
+            const updateTimeEl = document.getElementById('updateTime');
+            if (updateTimeEl && lastUpdateTime) updateTimeEl.textContent = '最后更新时间：' + formatTime(lastUpdateTime);
         }
 
         function formatTime(date) {
@@ -1867,6 +2172,9 @@
                 loadYangzhouData();
                 loadJiangsuData();
                 loadSucaiData();
+                // 渲染历史与统计
+                renderHistory();
+                updateStatsFromHistory();
             }
         };
 
