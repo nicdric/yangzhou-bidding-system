@@ -762,6 +762,22 @@
             color: var(--primary-color);
         }
         
+        /* 强制刷新链接（绕过代理缓存） */
+        .force-refresh-link {
+            display: block;
+            margin-top: 16px;
+            text-align: center;
+            font-size: 12px;
+            color: var(--primary-color);
+            cursor: pointer;
+            text-decoration: none;
+            opacity: 0.8;
+        }
+        .force-refresh-link:hover {
+            opacity: 1;
+            text-decoration: underline;
+        }
+        
         /* 空状态 */
         .empty-state {
             text-align: center;
@@ -803,6 +819,7 @@
             </div>
             <button onclick="login()">登录</button>
             <p class="error-msg" id="errorMsg">账户或密码错误</p>
+            <a class="force-refresh-link" onclick="location.href = location.pathname + '?v=' + Date.now()">🔄 页面打不开？点此强制刷新</a>
         </div>
     </div>
 
@@ -1058,6 +1075,20 @@
     </div>
 
     <script>
+        // ========== 自动绕过代理缓存（单位网络缓存时好时坏） ==========
+        // 页面加载后若 URL 无 v= 参数，则自动重定向到带时间戳的地址，强制代理拉取最新内容
+        (function autoBustCache() {
+            try {
+                const url = new URL(location.href);
+                if (!url.searchParams.has('v')) {
+                    url.searchParams.set('v', Date.now());
+                    location.replace(url.toString());
+                }
+            } catch (e) {
+                // URL 解析失败时跳过，不影响正常使用
+            }
+        })();
+
         // 用户数据（初始默认用户）
         let users = {};
 
