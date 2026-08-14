@@ -851,36 +851,6 @@
         .cat-gov { background: #e6f0ff; color: var(--primary-color); }
         .cat-construct { background: #fff2e6; color: #d4380d; }
         .cat-other { background: #f6ffed; color: #389e0d; }
-        
-        /* 招标信息 子板块切换 */
-        .bidding-subtabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 16px;
-        }
-        .bidding-subtab {
-            background: white;
-            border: 1px solid var(--border-color);
-            color: var(--text-secondary);
-            padding: 10px 22px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            transition: all 0.2s;
-        }
-        .bidding-subtab:hover {
-            border-color: var(--primary-color);
-            color: var(--primary-color);
-        }
-        .bidding-subtab.active {
-            background: var(--primary-color);
-            color: white;
-            border-color: var(--primary-color);
-        }
-        .bidding-subpanel { display: none; }
-        .bidding-subpanel.active { display: block; }
-        
         /* 空状态 */
         .empty-state {
             text-align: center;
@@ -1107,46 +1077,20 @@
                     <p>正在从多个数据源获取最新数据...</p>
                 </div>
                 
-                <!-- 招标信息子板块：政府采购 / 建设工程 -->
-                <div class="bidding-subtabs">
-                    <button class="bidding-subtab active" id="subGovBtn" onclick="showBiddingSub('gov')">🏛️ 政府采购</button>
-                    <button class="bidding-subtab" id="subConstructBtn" onclick="showBiddingSub('construct')">🏗️ 建设工程</button>
-                </div>
-                
-                <div id="biddingGovPanel" class="bidding-subpanel active">
-                    <div class="bidding-table">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th style="width: 38%">项目名称</th>
-                                    <th style="width: 18%">采购单位</th>
-                                    <th style="width: 12%">标的地区</th>
-                                    <th style="width: 10%">发布时间</th>
-                                    <th style="width: 12%">公告类型</th>
-                                    <th style="width: 10%">数据来源</th>
-                                </tr>
-                            </thead>
-                            <tbody id="biddingGovBody"></tbody>
-                        </table>
-                    </div>
-                </div>
-                
-                <div id="biddingConstructPanel" class="bidding-subpanel">
-                    <div class="bidding-table">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th style="width: 38%">项目名称</th>
-                                    <th style="width: 18%">采购单位</th>
-                                    <th style="width: 12%">标的地区</th>
-                                    <th style="width: 10%">发布时间</th>
-                                    <th style="width: 12%">公告类型</th>
-                                    <th style="width: 10%">数据来源</th>
-                                </tr>
-                            </thead>
-                            <tbody id="biddingConstructBody"></tbody>
-                        </table>
-                    </div>
+                <div class="bidding-table" id="biddingTable" style="display: none;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 38%">项目名称</th>
+                                <th style="width: 18%">采购单位</th>
+                                <th style="width: 12%">标的地区</th>
+                                <th style="width: 10%">发布时间</th>
+                                <th style="width: 12%">公告类型</th>
+                                <th style="width: 10%">数据来源</th>
+                            </tr>
+                        </thead>
+                        <tbody id="biddingTableBody"></tbody>
+                    </table>
                 </div>
             </div>
 
@@ -1567,15 +1511,9 @@
         }
 
         function renderYangzhouData(data) {
-            const govBody = document.getElementById('biddingGovBody');
-            const constructBody = document.getElementById('biddingConstructBody');
-            if (govBody) govBody.innerHTML = '';
-            if (constructBody) constructBody.innerHTML = '';
-            if (!govBody || !constructBody) return;
-
-            let govCount = 0, constructCount = 0;
+            const tbody = document.getElementById('biddingTableBody');
+            tbody.innerHTML = '';
             data.forEach(item => {
-                const cat = classifyBid(item);
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td><a href="${item.url}" target="_blank">${item.name}</a></td>
@@ -1585,35 +1523,13 @@
                     <td><span class="tag ${item.typeClass}">${item.type}</span></td>
                     <td><span class="source-badge badge-yangzhou">${item.source}</span></td>
                 `;
-                if (cat === 'construct') { constructBody.appendChild(row); constructCount++; }
-                else { govBody.appendChild(row); govCount++; }
+                tbody.appendChild(row);
             });
-
-            if (govCount === 0) govBody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:#999;">暂无政府采购类项目</td></tr>';
-            if (constructCount === 0) constructBody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:#999;">暂无建设工程类项目</td></tr>';
-
+            document.getElementById('biddingTable').style.display = 'block';
             document.getElementById('biddingUpdateTime').textContent = '更新时间：' + formatTime(lastUpdateTime);
         }
 
-        // 招标信息子板块切换
-        function showBiddingSub(type) {
-            const govPanel = document.getElementById('biddingGovPanel');
-            const conPanel = document.getElementById('biddingConstructPanel');
-            const govBtn = document.getElementById('subGovBtn');
-            const conBtn = document.getElementById('subConstructBtn');
-            if (!govPanel || !conPanel) return;
-            if (type === 'gov') {
-                govPanel.classList.add('active');
-                conPanel.classList.remove('active');
-                if (govBtn) govBtn.classList.add('active');
-                if (conBtn) conBtn.classList.remove('active');
-            } else {
-                conPanel.classList.add('active');
-                govPanel.classList.remove('active');
-                if (conBtn) conBtn.classList.add('active');
-                if (govBtn) govBtn.classList.remove('active');
-            }
-        }
+        function showBiddingSub(type) { }
 
         // 江苏省公共资源数据
         async function loadJiangsuData() {
