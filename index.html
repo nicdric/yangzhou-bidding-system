@@ -2127,6 +2127,14 @@
                     permissions: { overview: true, bidding: true, jiangsu: true, sucai: true, manage: false }
                 };
             }
+            if (!users['扬州']) {
+                users['扬州'] = {
+                    password: '123',
+                    role: 'user',
+                    name: '扬州公司',
+                    permissions: { overview: true, bidding: true, jiangsu: true, sucai: true, manage: false }
+                };
+            }
             
             // 为没有权限字段的旧用户添加默认权限
             Object.keys(users).forEach(username => {
