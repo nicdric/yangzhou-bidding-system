@@ -2169,24 +2169,25 @@
             const data = [];
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
-            // 尝试多个选择器模式
             const links = doc.querySelectorAll('a[href*="ccgp.gov.cn"]');
+            // 过滤关键词：江苏省/扬州相关
+            const keywords = ['江苏', '扬州', '南京', '苏州', '无锡', '常州', '镇江', '南通', '泰州', '盐城', '淮安', '徐州', '连云港', '宿迁', '苏州市', '南京市', '扬州市', '无锡市', '常州市', '镇江市', '南通市', '泰州市', '盐城市', '淮安市', '徐州市', '连云港市', '宿迁市'];
 
             links.forEach(link => {
                 const text = link.textContent.trim();
-                if (text && text.length > 8) {
-                    const href = link.href;
-                    // 排除导航链接
-                    if (href.includes('/search/') || href.includes('/news/') || href.includes('/xxgk/') || href.includes('/ccgp-')) {
-                        data.push({
-                            name: text,
-                            unit: '中国政府采购相关单位',
-                            region: '全国',
-                            date: new Date().toISOString().split('T')[0],
-                            type: '政府采购',
-                            url: href
-                        });
-                    }
+                const href = link.href || '';
+                const combined = text + ' ' + href;
+                // 只要标题或链接中含江苏/扬州相关关键词
+                const isRelevant = keywords.some(kw => combined.includes(kw));
+                if (isRelevant && text && text.length > 5 && !href.includes('/search/') && !href.includes('/index.html')) {
+                    data.push({
+                        name: text,
+                        unit: '中国政府采购相关单位',
+                        region: '江苏省',
+                        date: new Date().toISOString().split('T')[0],
+                        type: '政府采购',
+                        url: href
+                    });
                 }
             });
 
@@ -2194,11 +2195,15 @@
         }
 
         function useCcgpFallback() {
+            const today = new Date().toISOString().split('T')[0];
+            const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+            const twoDaysAgo = new Date(Date.now() - 86400000 * 2).toISOString().split('T')[0];
             const fallbackData = [
-                { name: '国家部委通用办公设备采购项目', unit: '国家机关事务管理局', region: '全国', date: new Date().toISOString().split('T')[0], type: '政府采购', url: 'http://www.ccgp.gov.cn/' },
-                { name: '中央预算单位信息化建设采购', unit: '财政部信息中心', region: '全国', date: new Date(Date.now() - 86400000).toISOString().split('T')[0], type: '政府采购', url: 'http://www.ccgp.gov.cn/' },
-                { name: '全国高校教学设备政府采购项目', unit: '教育部政府采购中心', region: '全国', date: new Date(Date.now() - 86400000 * 2).toISOString().split('T')[0], type: '政府采购', url: 'http://www.ccgp.gov.cn/' },
-                { name: '公共卫生应急物资采购公告', unit: '国家卫健委', region: '全国', date: new Date(Date.now() - 86400000 * 3).toISOString().split('T')[0], type: '政府采购', url: 'http://www.ccgp.gov.cn/' }
+                { name: '江苏省省级机关办公设备采购项目', unit: '江苏省机关事务管理局', region: '江苏省', date: today, type: '政府采购', url: 'http://www.ccgp.gov.cn/' },
+                { name: '扬州市某区智慧城市建设采购公告', unit: '扬州市某区财政局', region: '扬州市', date: today, type: '政府采购', url: 'http://www.ccgp.gov.cn/' },
+                { name: '苏州市轨道交通运营物资采购', unit: '苏州市轨道交通集团', region: '苏州市', date: yesterday, type: '政府采购', url: 'http://www.ccgp.gov.cn/' },
+                { name: '南京市教育系统信息化设备采购', unit: '南京市教育局', region: '南京市', date: yesterday, type: '政府采购', url: 'http://www.ccgp.gov.cn/' },
+                { name: '江苏省卫生健康委员会医疗设备采购', unit: '江苏省卫健委', region: '江苏省', date: twoDaysAgo, type: '政府采购', url: 'http://www.ccgp.gov.cn/' }
             ];
 
             renderCcgpColumn(fallbackData);
