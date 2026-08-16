@@ -804,6 +804,7 @@
         }
         .history-item {
             display: flex;
+            flex-wrap: wrap;
             align-items: center;
             justify-content: space-between;
             padding: 12px 14px;
@@ -837,6 +838,39 @@
             flex-shrink: 0;
             margin-left: 12px;
         }
+        .history-item-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px dashed var(--border-color);
+            flex-wrap: wrap;
+        }
+        .action-label {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+        .action-label input[type="checkbox"] {
+            cursor: pointer;
+            accent-color: var(--primary-color);
+        }
+        .action-label input:disabled { cursor: not-allowed; opacity: 0.7; }
+        .confirm-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 3px 10px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .confirm-btn:hover { background: var(--primary-hover); }
         .history-item-date {
             font-size: 12px;
             color: var(--text-secondary);
@@ -979,6 +1013,16 @@
                         <div class="stat-number" id="totalCount">156</div>
                         <div class="stat-label">累计项目</div>
                         <div class="stat-source">持续追踪</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="joinedCount" style="color: var(--accent-color);">0</div>
+                        <div class="stat-label">我司已参与</div>
+                        <div class="stat-source">主动追踪</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="wonCount" style="color: var(--success-color);">0</div>
+                        <div class="stat-label">已中标</div>
+                        <div class="stat-source">业务成果</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-number">6</div>
@@ -1793,12 +1837,16 @@
             }
 
             let html = '';
-            history.forEach(item => {
+            history.forEach((item, idx) => {
                 const cat = classifyBid(item);
                 let catClass = 'cat-other', catText = '其他';
                 if (cat === 'construct') { catClass = 'cat-construct'; catText = '建设工程'; }
                 else { catClass = 'cat-gov'; catText = '政府采购'; }
                 const collected = item.collectedAt ? formatTime(item.collectedAt) : '';
+                const joinedChecked = item.joined ? 'checked' : '';
+                const wonChecked = item.won ? 'checked' : '';
+                const joinedDisabled = item.joined ? 'disabled' : '';
+                const wonDisabled = item.won ? 'disabled' : '';
                 html += `
                     <div class="history-item">
                         <div class="history-item-main">
@@ -1814,10 +1862,31 @@
                             <div class="history-item-date">采集 ${collected}</div>
                             <span class="history-item-cat ${catClass}">${catText}</span>
                         </div>
+                        <div class="history-item-actions">
+                            <label class="action-label"><input type="checkbox" class="joined-check" data-idx="${idx}" ${joinedChecked} ${joinedDisabled}> 我司已参与</label>
+                            <label class="action-label"><input type="checkbox" class="won-check" data-idx="${idx}" ${wonChecked} ${wonDisabled}> 已中标</label>
+                            <button class="confirm-btn" onclick="confirmHistoryItem(${idx})">确认</button>
+                        </div>
                     </div>
                 `;
             });
             listEl.innerHTML = html;
+        }
+
+        function confirmHistoryItem(idx) {
+            const joinedCheck = document.querySelector('.joined-check[data-idx="' + idx + '"]');
+            const wonCheck = document.querySelector('.won-check[data-idx="' + idx + '"]');
+            let history = [];
+            try { history = JSON.parse(localStorage.getItem('bidding_history') || '[]'); } catch (e) { history = []; }
+            if (!history[idx]) return;
+            history[idx].joined = joinedCheck.checked;
+            history[idx].won = wonCheck.checked;
+            localStorage.setItem('bidding_history', JSON.stringify(history));
+            // 置灰已勾选项
+            if (joinedCheck.checked) joinedCheck.disabled = true;
+            if (wonCheck.checked) wonCheck.disabled = true;
+            // 更新统计
+            updateStatsFromHistory();
         }
 
         // ========== 统计：今日 / 本周 / 本年（按实际日期） ==========
@@ -1853,9 +1922,15 @@
             const todayEl = document.getElementById('todayCount');
             const weekEl = document.getElementById('weekCount');
             const totalEl = document.getElementById('totalCount');
+            const joinedEl = document.getElementById('joinedCount');
+            const wonEl = document.getElementById('wonCount');
             if (todayEl) todayEl.textContent = todayCount;
             if (weekEl) weekEl.textContent = weekCount;
             if (totalEl) totalEl.textContent = yearCount;
+            const joinedCount = history.filter(i => i.joined).length;
+            const wonCount = history.filter(i => i.won).length;
+            if (joinedEl) joinedEl.textContent = joinedCount;
+            if (wonEl) wonEl.textContent = wonCount;
         }
 
         // 兼容旧调用：采集入库并更新统计
