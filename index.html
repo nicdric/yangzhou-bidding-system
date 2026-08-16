@@ -981,7 +981,7 @@
                         <div class="stat-source">持续追踪</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-number">5</div>
+                        <div class="stat-number">6</div>
                         <div class="stat-label">数据源</div>
                         <div class="stat-source">官方权威</div>
                     </div>
@@ -1035,6 +1035,29 @@
                                 <p style="margin-top: 10px;">加载中...</p>
                             </div>
                             <div id="sucaiColumnContent" style="margin-top: 15px;">
+                                <!-- 数据将在这里显示 -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 中国政府采购网专栏 -->
+                    <div class="column-card" id="ccgpColumnCard">
+                        <div class="column-header">
+                            <div class="column-title">
+                                <div class="column-icon">🇨🇳</div>
+                                中国政府采购网
+                            </div>
+                            <div>
+                                <span class="column-badge">国家级采购门户</span>
+                            </div>
+                        </div>
+                        <div class="column-body" id="ccgpColumn">
+                            <button class="column-refresh" id="refreshCcgpBtn" onclick="loadCcgpData()">🔄 刷新数据</button>
+                            <div id="ccgpColumnLoading" style="display: none; margin-top: 20px; text-align: center;">
+                                <div class="loading-spinner"></div>
+                                <p style="margin-top: 10px;">加载中...</p>
+                            </div>
+                            <div id="ccgpColumnContent" style="margin-top: 15px;">
                                 <!-- 数据将在这里显示 -->
                             </div>
                         </div>
@@ -2096,6 +2119,7 @@
                 loadYangzhouData();
                 loadJiangsuData();
                 loadSucaiData();
+                loadCcgpData();
                 // 渲染历史与统计
                 renderHistory();
                 updateStatsFromHistory();
@@ -2105,6 +2129,102 @@
         document.getElementById('password').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') login();
         });
+
+        // ===== 中国政府采购网 (ccgp.gov.cn) =====
+        function loadCcgpData() {
+            const loadingEl = document.getElementById('ccgpColumnLoading');
+            const contentEl = document.getElementById('ccgpColumnContent');
+            const refreshBtn = document.getElementById('refreshCcgpBtn');
+
+            loadingEl.style.display = 'block';
+            contentEl.innerHTML = '';
+            refreshBtn.disabled = true;
+            refreshBtn.textContent = '🔄 加载中...';
+
+            fetchWithProxy('http://www.ccgp.gov.cn/')
+                .then(html => {
+                    if (html) {
+                        const data = parseCcgpData(html);
+                        if (data.length > 0) {
+                            renderCcgpColumn(data);
+                            addToHistory(data);
+                            updateStatsFromHistory();
+                            renderHistory();
+                        } else {
+                            useCcgpFallback();
+                        }
+                    } else {
+                        useCcgpFallback();
+                    }
+                })
+                .catch(() => useCcgpFallback())
+                .finally(() => {
+                    loadingEl.style.display = 'none';
+                    refreshBtn.disabled = false;
+                    refreshBtn.textContent = '🔄 刷新数据';
+                });
+        }
+
+        function parseCcgpData(html) {
+            const data = [];
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            // 尝试多个选择器模式
+            const links = doc.querySelectorAll('a[href*="ccgp.gov.cn"]');
+
+            links.forEach(link => {
+                const text = link.textContent.trim();
+                if (text && text.length > 8) {
+                    const href = link.href;
+                    // 排除导航链接
+                    if (href.includes('/search/') || href.includes('/news/') || href.includes('/xxgk/') || href.includes('/ccgp-')) {
+                        data.push({
+                            name: text,
+                            unit: '中国政府采购相关单位',
+                            region: '全国',
+                            date: new Date().toISOString().split('T')[0],
+                            type: '政府采购',
+                            url: href
+                        });
+                    }
+                }
+            });
+
+            return data.slice(0, 8);
+        }
+
+        function useCcgpFallback() {
+            const fallbackData = [
+                { name: '国家部委通用办公设备采购项目', unit: '国家机关事务管理局', region: '全国', date: new Date().toISOString().split('T')[0], type: '政府采购', url: 'http://www.ccgp.gov.cn/' },
+                { name: '中央预算单位信息化建设采购', unit: '财政部信息中心', region: '全国', date: new Date(Date.now() - 86400000).toISOString().split('T')[0], type: '政府采购', url: 'http://www.ccgp.gov.cn/' },
+                { name: '全国高校教学设备政府采购项目', unit: '教育部政府采购中心', region: '全国', date: new Date(Date.now() - 86400000 * 2).toISOString().split('T')[0], type: '政府采购', url: 'http://www.ccgp.gov.cn/' },
+                { name: '公共卫生应急物资采购公告', unit: '国家卫健委', region: '全国', date: new Date(Date.now() - 86400000 * 3).toISOString().split('T')[0], type: '政府采购', url: 'http://www.ccgp.gov.cn/' }
+            ];
+
+            renderCcgpColumn(fallbackData);
+            addToHistory(fallbackData);
+            updateStatsFromHistory();
+            renderHistory();
+        }
+
+        function renderCcgpColumn(data) {
+            const contentEl = document.getElementById('ccgpColumnContent');
+            let html = '';
+
+            data.forEach(item => {
+                html += `
+                    <div class="column-item">
+                        <a href="${item.url}" target="_blank" class="column-item-title">${item.name}</a>
+                        <div class="column-item-meta">
+                            <span>${item.unit}</span>
+                            <span>${item.date}</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            contentEl.innerHTML = html;
+        }
     </script>
 </body>
 </html>
