@@ -1901,23 +1901,35 @@
 
         function confirmJoined(idx) {
             const joinedCheck = document.querySelector('.joined-check[data-idx="' + idx + '"]');
+            if (!joinedCheck.checked) return;
+            const confirmed = confirm('请根据实际情况进行确认，未参与、未中标无需确认，请谨慎点击！');
+            if (!confirmed) {
+                joinedCheck.checked = false;
+                return;
+            }
             let history = [];
             try { history = JSON.parse(localStorage.getItem('bidding_history') || '[]'); } catch (e) { history = []; }
             if (!history[idx]) return;
-            history[idx].joined = joinedCheck.checked;
+            history[idx].joined = true;
             localStorage.setItem('bidding_history', JSON.stringify(history));
-            if (joinedCheck.checked) joinedCheck.disabled = true;
+            joinedCheck.disabled = true;
             updateStatsFromHistory();
         }
 
         function confirmWon(idx) {
             const wonCheck = document.querySelector('.won-check[data-idx="' + idx + '"]');
+            if (!wonCheck.checked) return;
+            const confirmed = confirm('请根据实际情况进行确认，未参与、未中标无需确认，请谨慎点击！');
+            if (!confirmed) {
+                wonCheck.checked = false;
+                return;
+            }
             let history = [];
             try { history = JSON.parse(localStorage.getItem('bidding_history') || '[]'); } catch (e) { history = []; }
             if (!history[idx]) return;
-            history[idx].won = wonCheck.checked;
+            history[idx].won = true;
             localStorage.setItem('bidding_history', JSON.stringify(history));
-            if (wonCheck.checked) wonCheck.disabled = true;
+            wonCheck.disabled = true;
             updateStatsFromHistory();
         }
 
