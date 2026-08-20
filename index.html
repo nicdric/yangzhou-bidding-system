@@ -787,6 +787,48 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.06);
             border: 1px solid var(--border-color);
         }
+        .history-search {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin: 10px 0 14px 0;
+        }
+        .history-search input {
+            flex: 1;
+            padding: 9px 14px;
+            border: 1.5px solid #d0d7e2;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.2s;
+            background: #f8fafc;
+        }
+        .history-search input:focus {
+            border-color: #004098;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(0,64,152,0.08);
+        }
+        .search-clear-btn {
+            padding: 9px 16px;
+            background: #eef2f7;
+            color: #4a5568;
+            border: 1px solid #d0d7e2;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .search-clear-btn:hover {
+            background: #004098;
+            color: white;
+            border-color: #004098;
+        }
+        .history-search .search-highlight {
+            background: #fff3a3;
+            padding: 0 2px;
+            border-radius: 2px;
+        }
         .history-count {
             display: inline-block;
             background: var(--primary-color);
@@ -1147,6 +1189,10 @@
                     <p style="font-size: 12px; color: var(--text-secondary); margin-top: 6px;">
                         网页运行后采集的所有项目将永久保存在本地，按时间从新到旧排列。
                     </p>
+                    <div class="history-search">
+                        <input type="text" id="historySearchInput" placeholder="🔍 搜索项目名称、采购单位、地区..." oninput="renderHistory()" />
+                        <button class="search-clear-btn" onclick="document.getElementById('historySearchInput').value='';renderHistory();">清空</button>
+                    </div>
                     <div class="history-list" id="historyList">
                         <div class="empty-state">
                             <div class="empty-state-icon">📭</div>
@@ -1870,21 +1916,35 @@
         function renderHistory() {
             const listEl = document.getElementById('historyList');
             const countEl = document.getElementById('historyCount');
+            const searchEl = document.getElementById('historySearchInput');
             if (!listEl) return;
             let history = [];
             try { history = JSON.parse(localStorage.getItem('bidding_history') || '[]'); } catch (e) { history = []; }
 
             // 按采集时间从新到旧排列
             history.sort((a, b) => new Date(b.collectedAt) - new Date(a.collectedAt));
-            if (countEl) countEl.textContent = history.length;
+            // 搜索过滤
+            const keyword = searchEl ? (searchEl.value || '').trim().toLowerCase() : '';
+            let filtered = history;
+            if (keyword) {
+                filtered = history.filter(item => {
+                    const haystack = ((item.name || '') + ' ' + (item.unit || '') + ' ' + (item.region || '') + ' ' + (item.source || '') + ' ' + (item.type || '')).toLowerCase();
+                    return haystack.includes(keyword);
+                });
+            }
+            if (countEl) countEl.textContent = filtered.length + (keyword ? ' / ' + history.length : '');
 
-            if (history.length === 0) {
-                listEl.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📭</div><p>暂无历史项目，刷新各数据源后将自动采集</p></div>';
+            if (filtered.length === 0) {
+                if (keyword) {
+                    listEl.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🔍</div><p>未找到匹配 “' + escapeHtml(keyword) + '” 的历史项目</p></div>';
+                } else {
+                    listEl.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📭</div><p>暂无历史项目，刷新各数据源后将自动采集</p></div>';
+                }
                 return;
             }
 
             let html = '';
-            history.forEach((item, idx) => {
+            filtered.forEach((item, idx) => {
                 const cat = classifyBid(item);
                 let catClass = 'cat-other', catText = '其他';
                 if (cat === 'construct') { catClass = 'cat-construct'; catText = '建设工程'; }
@@ -1894,15 +1954,22 @@
                 const wonChecked = item.won ? 'checked' : '';
                 const joinedDisabled = item.joined ? 'disabled' : '';
                 const wonDisabled = item.won ? 'disabled' : '';
+                // 关键字高亮函数
+                const hl = (s) => {
+                    if (!keyword) return escapeHtml(s);
+                    const e = escapeHtml(s);
+                    const ke = escapeHtml(keyword);
+                    return e.replace(new RegExp(ke.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), m => '<span class="search-highlight">' + m + '</span>');
+                };
                 html += `
                     <div class="history-item">
                         <div class="history-item-main">
-                            <a href="${item.url || '#'}" target="_blank" class="history-item-title">${item.name}</a>
+                            <a href="${escapeHtml(item.url || '#')}" target="_blank" class="history-item-title">${hl(item.name || '')}</a>
                             <div class="history-item-meta">
-                                <span>🏢 ${item.unit || '-'}</span>
-                                <span>📍 ${item.region || '-'}</span>
-                                <span>📅 发布 ${item.date || '-'}</span>
-                                <span>🔗 ${item.source || '-'}</span>
+                                <span>🏢 ${hl(item.unit || '-')}</span>
+                                <span>📍 ${hl(item.region || '-')}</span>
+                                <span>📅 发布 ${escapeHtml(item.date || '-')}</span>
+                                <span>🔗 ${hl(item.source || '-')}</span>
                             </div>
                         </div>
                         <div class="history-item-side">
@@ -2026,6 +2093,16 @@
             renderHistory();
             const updateTimeEl = document.getElementById('updateTime');
             if (updateTimeEl && lastUpdateTime) updateTimeEl.textContent = '最后更新时间：' + formatTime(lastUpdateTime);
+        }
+
+        function escapeHtml(str) {
+            if (str == null) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
         }
 
         function formatTime(date) {
