@@ -2393,7 +2393,15 @@
                     password: '123',
                     role: 'user',
                     name: '扬州公司',
-                    permissions: { overview: true, bidding: true, jiangsu: true, sucai: true, manage: false, clearSearch: true, joined: true, won: true, confirm: true }
+                    permissions: { overview: true, bidding: true, jiangsu: true, sucai: true, manage: false, clearSearch: true, joined: false, won: false, confirm: false }
+                };
+            }
+            if (!users['县支']) {
+                users['县支'] = {
+                    password: '123456',
+                    role: 'user',
+                    name: '县支公司',
+                    permissions: { overview: true, bidding: true, jiangsu: true, sucai: true, manage: false, clearSearch: true, joined: false, won: false, confirm: false }
                 };
             }
             
