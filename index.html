@@ -1487,18 +1487,25 @@
         }
 
         function applyHistoryButtonVisibility() {
-            const username = (typeof currentUser !== 'undefined' && currentUser) ? currentUser : null;
+            // 兼容 currentUsername 和 currentUser 两个全局变量名
+            let username = (typeof currentUsername !== 'undefined' && currentUsername) ? currentUsername : null;
+            if (!username && typeof currentUser !== 'undefined' && currentUser) username = currentUser;
+            if (!username) {
+                // 兑底从 localStorage 读
+                try { username = localStorage.getItem('currentUser'); } catch (e) {}
+            }
             if (!username) return;
             const user = users[username];
             if (!user || !user.permissions) return;
+            const p = user.permissions;
             const clearBtn = document.querySelector('.search-clear-btn');
             const joinedEls = document.querySelectorAll('.action-label-joined, .history-joined-action');
             const wonEls = document.querySelectorAll('.action-label-won, .history-won-action');
             const confirmEls = document.querySelectorAll('.confirm-btn, .history-confirm-action');
-            if (clearBtn) clearBtn.style.display = user.permissions.clearSearch ? '' : 'none';
-            joinedEls.forEach(el => el.style.display = user.permissions.joined ? '' : 'none');
-            wonEls.forEach(el => el.style.display = user.permissions.won ? '' : 'none');
-            confirmEls.forEach(el => el.style.display = user.permissions.confirm ? '' : 'none');
+            if (clearBtn) clearBtn.style.display = p.clearSearch === false ? 'none' : '';
+            joinedEls.forEach(el => el.style.display = p.joined === false ? 'none' : '');
+            wonEls.forEach(el => el.style.display = p.won === false ? 'none' : '');
+            confirmEls.forEach(el => el.style.display = p.confirm === false ? 'none' : '');
         }
 
         function login() {
