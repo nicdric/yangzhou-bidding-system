@@ -1499,13 +1499,14 @@
             if (!user || !user.permissions) return;
             const p = user.permissions;
             const clearBtn = document.querySelector('.search-clear-btn');
-            const joinedEls = document.querySelectorAll('.action-label-joined, .history-joined-action');
-            const wonEls = document.querySelectorAll('.action-label-won, .history-won-action');
-            const confirmEls = document.querySelectorAll('.confirm-btn, .history-confirm-action');
+            // 使用 action-group 整体隐藏，让 label 文字 + input + 按钮一起隐藏
+            const joinedGroups = document.querySelectorAll('.history-joined-group');
+            const wonGroups = document.querySelectorAll('.history-won-group');
+            const confirmBtns = document.querySelectorAll('.confirm-btn.history-confirm-action');
             if (clearBtn) clearBtn.style.display = p.clearSearch === false ? 'none' : '';
-            joinedEls.forEach(el => el.style.display = p.joined === false ? 'none' : '');
-            wonEls.forEach(el => el.style.display = p.won === false ? 'none' : '');
-            confirmEls.forEach(el => el.style.display = p.confirm === false ? 'none' : '');
+            joinedGroups.forEach(el => el.style.display = p.joined === false ? 'none' : '');
+            wonGroups.forEach(el => el.style.display = p.won === false ? 'none' : '');
+            confirmBtns.forEach(el => el.style.display = p.confirm === false ? 'none' : '');
         }
 
         function login() {
@@ -2051,12 +2052,12 @@
                             <span class="history-item-cat ${catClass}">${catText}</span>
                         </div>
                         <div class="history-item-actions">
-                            <div class="action-group">
-                                <label class="action-label"><input type="checkbox" class="joined-check action-label-joined history-joined-action" data-idx="${idx}" ${joinedChecked} ${joinedDisabled}> 我司已参与</label>
+                            <div class="action-group history-joined-group">
+                                <label class="action-label history-joined-label"><input type="checkbox" class="joined-check action-label-joined history-joined-action" data-idx="${idx}" ${joinedChecked} ${joinedDisabled}> 我司已参与</label>
                                 <button class="confirm-btn history-confirm-action" onclick="confirmJoined(${idx})">确认</button>
                             </div>
-                            <div class="action-group">
-                                <label class="action-label"><input type="checkbox" class="won-check action-label-won history-won-action" data-idx="${idx}" ${wonChecked} ${wonDisabled}> 已中标</label>
+                            <div class="action-group history-won-group">
+                                <label class="action-label history-won-label"><input type="checkbox" class="won-check action-label-won history-won-action" data-idx="${idx}" ${wonChecked} ${wonDisabled}> 已中标</label>
                                 <button class="confirm-btn history-confirm-action" onclick="confirmWon(${idx})">确认</button>
                             </div>
                         </div>
