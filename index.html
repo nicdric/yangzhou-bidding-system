@@ -789,14 +789,14 @@
         }
         .history-search {
             display: flex;
-            gap: 8px;
+            gap: 6px;
             align-items: center;
             margin: 10px 0 14px 0;
-            width: 50%;
+            width: 100%;
         }
         .history-search input {
-            flex: 1;
-            width: 100%;
+            flex: 1 1 auto;
+            width: 50%;
             min-width: 0;
             padding: 9px 14px;
             border: 1.5px solid #d0d7e2;
@@ -808,6 +808,16 @@
             transition: all 0.2s;
             background: #ffffff;
             text-overflow: clip;
+        }
+        .history-refresh-btn {
+            flex: 0 0 auto;
+            padding: 1px 2px;
+            font-size: 10px;
+            border-radius: 4px;
+            white-space: nowrap;
+            /* 宽度限制为常规刷新按钮的 1/5 */
+            min-width: 0;
+            max-width: 60px;
         }
         .history-search input:focus {
             border-color: #004098;
@@ -1191,12 +1201,12 @@
                         <div class="section-icon">📚</div>
                         历史招标项目
                         <span class="history-count" id="historyCount">0</span>
-                        <button class="refresh-btn" onclick="renderHistory()" style="margin-left: auto;">🔄 刷新</button>
                     </div>
                     <p style="font-size: 12px; color: var(--text-secondary); margin-top: 6px;">
                         网页运行后采集的所有项目将永久保存在本地，按时间从新到旧排列。
                     </p>
                     <div class="history-search">
+                        <button class="refresh-btn history-refresh-btn" onclick="renderHistory()">🔄 刷新</button>
                         <input type="text" id="historySearchInput" placeholder="🔍 搜索项目名称、采购单位、地区..." oninput="renderHistory()" />
                         <button class="search-clear-btn" onclick="document.getElementById('historySearchInput').value='';renderHistory();">清空</button>
                     </div>
@@ -1296,6 +1306,22 @@
                         <label class="permission-checkbox">
                             <input type="checkbox" id="permManage">
                             <span>权限管理 - 添加/编辑用户（仅管理员）</span>
+                        </label>
+                        <label class="permission-checkbox">
+                            <input type="checkbox" id="permClearSearch" checked>
+                            <span>清空 - 可点击历史项目搜索清空按钮</span>
+                        </label>
+                        <label class="permission-checkbox">
+                            <input type="checkbox" id="permJoined" checked>
+                            <span>我司已参与 - 可勾选历史项目</span>
+                        </label>
+                        <label class="permission-checkbox">
+                            <input type="checkbox" id="permWon" checked>
+                            <span>已中标 - 可勾选历史项目</span>
+                        </label>
+                        <label class="permission-checkbox">
+                            <input type="checkbox" id="permConfirm" checked>
+                            <span>确认 - 可点击历史项目确认按钮</span>
                         </label>
                     </div>
                     
@@ -1428,17 +1454,41 @@
         function applyPermissions(username) {
             const user = users[username];
             if (!user) return;
-            
+
+            // 补齐新权限（老用户可能不存在这些字段）
+            if (user.permissions.clearSearch === undefined) user.permissions.clearSearch = true;
+            if (user.permissions.joined === undefined) user.permissions.joined = true;
+            if (user.permissions.won === undefined) user.permissions.won = true;
+            if (user.permissions.confirm === undefined) user.permissions.confirm = true;
+
             // 显示/隐藏导航按钮
             document.getElementById('navOverview').style.display = checkPermission(username, 'overview') ? 'block' : 'none';
             document.getElementById('navBidding').style.display = checkPermission(username, 'bidding') ? 'block' : 'none';
             document.getElementById('navUsers').style.display = checkPermission(username, 'manage') ? 'block' : 'none';
-            
+
             // 显示/隐藏专栏卡片
             const jiangsuCard = document.getElementById('jiangsuColumnCard');
             const sucaiCard = document.getElementById('sucaiColumnCard');
             if (jiangsuCard) jiangsuCard.style.display = checkPermission(username, 'jiangsu') ? 'block' : 'none';
             if (sucaiCard) sucaiCard.style.display = checkPermission(username, 'sucai') ? 'block' : 'none';
+
+            // 控制历史项目区按钮可见性
+            applyHistoryButtonVisibility();
+        }
+
+        function applyHistoryButtonVisibility() {
+            const username = (typeof currentUser !== 'undefined' && currentUser) ? currentUser : null;
+            if (!username) return;
+            const user = users[username];
+            if (!user || !user.permissions) return;
+            const clearBtn = document.querySelector('.search-clear-btn');
+            const joinedEls = document.querySelectorAll('.action-label-joined, .history-joined-action');
+            const wonEls = document.querySelectorAll('.action-label-won, .history-won-action');
+            const confirmEls = document.querySelectorAll('.confirm-btn, .history-confirm-action');
+            if (clearBtn) clearBtn.style.display = user.permissions.clearSearch ? '' : 'none';
+            joinedEls.forEach(el => el.style.display = user.permissions.joined ? '' : 'none');
+            wonEls.forEach(el => el.style.display = user.permissions.won ? '' : 'none');
+            confirmEls.forEach(el => el.style.display = user.permissions.confirm ? '' : 'none');
         }
 
         function login() {
@@ -1985,18 +2035,20 @@
                         </div>
                         <div class="history-item-actions">
                             <div class="action-group">
-                                <label class="action-label"><input type="checkbox" class="joined-check" data-idx="${idx}" ${joinedChecked} ${joinedDisabled}> 我司已参与</label>
-                                <button class="confirm-btn" onclick="confirmJoined(${idx})">确认</button>
+                                <label class="action-label"><input type="checkbox" class="joined-check action-label-joined history-joined-action" data-idx="${idx}" ${joinedChecked} ${joinedDisabled}> 我司已参与</label>
+                                <button class="confirm-btn history-confirm-action" onclick="confirmJoined(${idx})">确认</button>
                             </div>
                             <div class="action-group">
-                                <label class="action-label"><input type="checkbox" class="won-check" data-idx="${idx}" ${wonChecked} ${wonDisabled}> 已中标</label>
-                                <button class="confirm-btn" onclick="confirmWon(${idx})">确认</button>
+                                <label class="action-label"><input type="checkbox" class="won-check action-label-won history-won-action" data-idx="${idx}" ${wonChecked} ${wonDisabled}> 已中标</label>
+                                <button class="confirm-btn history-confirm-action" onclick="confirmWon(${idx})">确认</button>
                             </div>
                         </div>
                     </div>
                 `;
             });
             listEl.innerHTML = html;
+            // 渲染后按权限控制可见性
+            if (typeof applyHistoryButtonVisibility === 'function') applyHistoryButtonVisibility();
         }
 
         function confirmHistoryItem(idx) {
@@ -2141,6 +2193,10 @@
                     if (user.permissions.jiangsu) perms.push('工程');
                     if (user.permissions.sucai) perms.push('苏采云');
                     if (user.permissions.manage) perms.push('管理');
+                    if (user.permissions.clearSearch) perms.push('清空');
+                    if (user.permissions.joined) perms.push('参与');
+                    if (user.permissions.won) perms.push('中标');
+                    if (user.permissions.confirm) perms.push('确认');
                     permText = perms.length > 0 ? perms.join('、') : '无权限';
                 } else {
                     permText = '默认全部';
@@ -2188,7 +2244,11 @@
                 bidding: document.getElementById('permBidding').checked,
                 jiangsu: document.getElementById('permJiangsu').checked,
                 sucai: document.getElementById('permSucai').checked,
-                manage: document.getElementById('permManage').checked
+                manage: document.getElementById('permManage').checked,
+                clearSearch: document.getElementById('permClearSearch').checked,
+                joined: document.getElementById('permJoined').checked,
+                won: document.getElementById('permWon').checked,
+                confirm: document.getElementById('permConfirm').checked
             };
             
             users[username] = { 
@@ -2280,27 +2340,27 @@
             
             // 确保默认用户存在，并添加默认权限
             if (!users['admin']) {
-                users['admin'] = { 
-                    password: 'Aa112233*-', 
-                    role: 'admin', 
+                users['admin'] = {
+                    password: 'Aa112233*-',
+                    role: 'admin',
                     name: '管理员',
-                    permissions: { overview: true, bidding: true, jiangsu: true, sucai: true, manage: true }
+                    permissions: { overview: true, bidding: true, jiangsu: true, sucai: true, manage: true, clearSearch: true, joined: true, won: true, confirm: true }
                 };
             }
             if (!users['13812345678']) {
-                users['13812345678'] = { 
-                    password: 'Test1234', 
-                    role: 'user', 
+                users['13812345678'] = {
+                    password: 'Test1234',
+                    role: 'user',
                     name: '用户1',
-                    permissions: { overview: true, bidding: true, jiangsu: true, sucai: true, manage: false }
+                    permissions: { overview: true, bidding: true, jiangsu: true, sucai: true, manage: false, clearSearch: true, joined: true, won: true, confirm: true }
                 };
             }
             if (!users['15998765432']) {
-                users['15998765432'] = { 
-                    password: 'Yangzhou2026', 
-                    role: 'user', 
+                users['15998765432'] = {
+                    password: 'Yangzhou2026',
+                    role: 'user',
                     name: '用户2',
-                    permissions: { overview: true, bidding: true, jiangsu: true, sucai: true, manage: false }
+                    permissions: { overview: true, bidding: true, jiangsu: true, sucai: true, manage: false, clearSearch: true, joined: true, won: true, confirm: true }
                 };
             }
             if (!users['15150836006']) {
@@ -2316,7 +2376,7 @@
                     password: '123',
                     role: 'user',
                     name: '扬州公司',
-                    permissions: { overview: true, bidding: true, jiangsu: true, sucai: true, manage: false }
+                    permissions: { overview: true, bidding: true, jiangsu: true, sucai: true, manage: false, clearSearch: true, joined: true, won: true, confirm: true }
                 };
             }
             
@@ -2331,6 +2391,12 @@
                         manage: users[username].role === 'admin'
                     };
                 }
+                // 补齐新权限字段
+                const p = users[username].permissions;
+                if (p.clearSearch === undefined) p.clearSearch = true;
+                if (p.joined === undefined) p.joined = true;
+                if (p.won === undefined) p.won = true;
+                if (p.confirm === undefined) p.confirm = true;
             });
             
             loadUsers();
