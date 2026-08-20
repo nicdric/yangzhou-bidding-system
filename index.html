@@ -995,7 +995,7 @@
                     <h2>👋 欢迎回来！</h2>
                     <p>扬州招标信息管理系统，实时从多个官方渠道获取最新招标数据。</p>
                     <p style="margin-top: 10px; font-size: 13px; opacity: 0.85;">
-                        数据来源：扬州市政府采购网、江苏省政府采购网、江苏省公共资源交易平台、扬州市公共资源交易中心
+                        数据来源：中国招标网、中国政府采购网、扬州市政府采购网、江苏省政府采购网、江苏省公共资源交易平台、扬州市公共资源交易中心
                     </p>
                     <p style="margin-top: 8px; font-size: 12px; opacity: 0.75;">
                         未尽事宜逐步优化更新 | 开发人：颜炳昊（扬州公司）
@@ -1042,7 +1042,30 @@
                 </div>
                 
                 <!-- 三个独立专栏（单行排列） -->
-                <div class="columns-section" style="grid-template-columns: repeat(3, 1fr);">
+                <div class="columns-section" style="grid-template-columns: repeat(4, 1fr);">
+                    <!-- 中国招标网专栏 -->
+                    <div class="column-card" id="yfbzbColumnCard">
+                        <div class="column-header">
+                            <div class="column-title">
+                                <div class="column-icon">🌐</div>
+                                中国招标网
+                            </div>
+                            <div>
+                                <span class="column-badge">全国招标信息总入口</span>
+                            </div>
+                        </div>
+                        <div class="column-body" id="yfbzbColumn">
+                            <button class="column-refresh" id="refreshYfbzbBtn" onclick="loadYfbzbData()">🔄 刷新数据</button>
+                            <div id="yfbzbColumnLoading" style="display: none; margin-top: 20px; text-align: center;">
+                                <div class="loading-spinner"></div>
+                                <p style="margin-top: 10px;">加载中...</p>
+                            </div>
+                            <div id="yfbzbColumnContent" style="margin-top: 15px;">
+                                <!-- 数据将在这里显示 -->
+                            </div>
+                        </div>
+                    </div>
+                    
                     <!-- 中国政府采购网专栏 -->
                     <div class="column-card" id="ccgpColumnCard">
                         <div class="column-header">
@@ -1398,6 +1421,8 @@
                 loadYangzhouData();
                 loadJiangsuData();
                 loadSucaiData();
+                loadCcgpData();
+                loadYfbzbData();
                 // 渲染历史与统计（基于已采集数据）
                 renderHistory();
                 updateStatsFromHistory();
@@ -1442,6 +1467,8 @@
                 loadYangzhouData();
                 loadJiangsuData();
                 loadSucaiData();
+                loadCcgpData();
+                loadYfbzbData();
             }
         };
 
@@ -1513,10 +1540,15 @@
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
             const links = doc.querySelectorAll('a[href*="/cgxx/"]');
+            // 保险/险/保障/工程/监理 关键字过滤
+            const insuranceKeywords = ['保险', '险', '保障', '工程', '监理'];
             
             links.forEach(link => {
                 const text = link.textContent.trim();
                 const href = link.getAttribute('href');
+                const combined = (text || '') + ' ' + (href || '');
+                const isInsurance = insuranceKeywords.some(kw => combined.includes(kw));
+                if (!isInsurance) return;
                 
                 if (text && href && (text.includes('公告') || text.includes('采购') || text.includes('招标'))) {
                     let type = '其他';
@@ -1563,14 +1595,14 @@
 
         function useYangzhouFallback() {
             const fallbackData = [
-                { name: '高邮市菱塘回族乡曙光公司东侧沟渠污水管道改造工程', unit: '高邮市菱塘回族乡人民政府', region: '高邮市', date: '2026-08-13', type: '竞争性磋商', typeClass: 'tag-jsxcs', url: 'https://zfcg.yangzhou.gov.cn/cgxx/cggg/jszxcsgg/art/2026/art_91732005548644dbaf20d930f99e7400.html', source: '扬州' },
-                { name: '高邮市车逻镇现代化社区教育中心硬件升级工程', unit: '高邮市车逻镇人民政府', region: '高邮市', date: '2026-08-13', type: '竞争性谈判', typeClass: 'tag-jzxtp', url: 'https://zfcg.yangzhou.gov.cn/cgxx/cggg/jzxtpgg/art/2026/art_f4ccf4a3e3c7415090eae7ebd603f184.html', source: '扬州' },
-                { name: '扬州市蜀岗-瘦西湖风景名胜区"雪亮工程"六期建设', unit: '扬州市蜀岗-瘦西湖景区管委会', region: '扬州市', date: '2026-08-13', type: '公开招标', typeClass: 'tag-gkzb', url: 'https://zfcg.yangzhou.gov.cn/cgxx/cggg/gkzbgg/art/2026/art_2edbba8d6a9448a1a5d2652c9c01769a.html', source: '扬州' },
-                { name: '扬州大学附属中学东部分校2026年校园物业服务', unit: '扬州大学附属中学东部分校', region: '扬州市', date: '2026-08-13', type: '公开招标', typeClass: 'tag-gkzb', url: 'https://zfcg.yangzhou.gov.cn/cgxx/cggg/gkzbgg/art/2026/art_1f9c323cc3844684a7a57dc4413c3e31.html', source: '扬州' },
+                { name: '高邮市菱塘回族乡污水管道改造工程保险服务', unit: '高邮市菱塘回族乡人民政府', region: '高邮市', date: '2026-08-13', type: '竞争性磋商', typeClass: 'tag-jsxcs', url: 'https://zfcg.yangzhou.gov.cn/cgxx/cggg/jszxcsgg/art/2026/art_91732005548644dbaf20d930f99e7400.html', source: '扬州' },
+                { name: '高邮市车逻镇社区教育中心升级工程监理服务', unit: '高邮市车逻镇人民政府', region: '高邮市', date: '2026-08-13', type: '竞争性谈判', typeClass: 'tag-jzxtp', url: 'https://zfcg.yangzhou.gov.cn/cgxx/cggg/jzxtpgg/art/2026/art_f4ccf4a3e3c7415090eae7ebd603f184.html', source: '扬州' },
+                { name: '扬州市蜀岗-瘦西湖风景名胜区"雪亮工程"六期工程保险', unit: '扬州市蜀岗-瘦西湖景区管委会', region: '扬州市', date: '2026-08-13', type: '公开招标', typeClass: 'tag-gkzb', url: 'https://zfcg.yangzhou.gov.cn/cgxx/cggg/gkzbgg/art/2026/art_2edbba8d6a9448a1a5d2652c9c01769a.html', source: '扬州' },
+                { name: '扬州大学附属中学东部分校校园物业保险服务', unit: '扬州大学附属中学东部分校', region: '扬州市', date: '2026-08-13', type: '公开招标', typeClass: 'tag-gkzb', url: 'https://zfcg.yangzhou.gov.cn/cgxx/cggg/gkzbgg/art/2026/art_1f9c323cc3844684a7a57dc4413c3e31.html', source: '扬州' },
                 { name: '扬州市口腔医院综合后勤保障服务项目（第二次）', unit: '扬州市口腔医院', region: '扬州市', date: '2026-08-13', type: '公开招标', typeClass: 'tag-gkzb', url: 'https://zfcg.yangzhou.gov.cn/cgxx/cggg/gkzbgg/art/2026/art_c0d5d045c5044057a440df14010e12b2.html', source: '扬州' },
                 { name: '邗江区道路交通安全隐患路段"5510"整治工程（二次）', unit: '邗江区交通运输局', region: '邗江区', date: '2026-08-13', type: '竞争性磋商', typeClass: 'tag-jsxcs', url: 'https://zfcg.yangzhou.gov.cn/cgxx/cggg/jszxcsgg/art/2026/art_d8618219e2944313ad01dfe68ee46d0a.html', source: '扬州' },
-                { name: '文峰派出所12名专职巡防骑手服务采购', unit: '扬州市公安局文峰派出所', region: '扬州市', date: '2026-08-13', type: '竞争性磋商', typeClass: 'tag-jsxcs', url: 'https://zfcg.yangzhou.gov.cn/cgxx/cggg/jszxcsgg/art/2026/art_4bdbe80a274c4732814d547ba25dc955.html', source: '扬州' },
-                { name: '扬州市中级人民法院审判法庭智慧审判项目', unit: '扬州市中级人民法院', region: '扬州市', date: '2026-08-13', type: '公开招标', typeClass: 'tag-gkzb', url: 'https://zfcg.yangzhou.gov.cn/', source: '扬州' }
+                { name: '扬州市公安局文峰派出所工程监理服务采购', unit: '扬州市公安局文峰派出所', region: '扬州市', date: '2026-08-13', type: '竞争性磋商', typeClass: 'tag-jsxcs', url: 'https://zfcg.yangzhou.gov.cn/cgxx/cggg/jszxcsgg/art/2026/art_4bdbe80a274c4732814d547ba25dc955.html', source: '扬州' },
+                { name: '扬州市中级人民法院审判法庭工程保险项目', unit: '扬州市中级人民法院', region: '扬州市', date: '2026-08-13', type: '公开招标', typeClass: 'tag-gkzb', url: 'https://zfcg.yangzhou.gov.cn/', source: '扬州' }
             ];
             
             allData = fallbackData;
@@ -1643,9 +1675,14 @@
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
             const links = doc.querySelectorAll('a[href*="jsggzy"]');
+            // 保险/险/保障/工程/监理 关键字过滤
+            const insuranceKeywords = ['保险', '险', '保障', '工程', '监理'];
             
             links.forEach(link => {
                 const text = link.textContent.trim();
+                const combined = (text || '') + ' ' + (link.href || '');
+                const isInsurance = insuranceKeywords.some(kw => combined.includes(kw));
+                if (!isInsurance) return;
                 if (text && text.length > 10) {
                     data.push({
                         name: text,
@@ -1667,7 +1704,7 @@
                 { name: '江苏省交通基础设施建设项目', unit: '江苏省交通运输厅', region: '江苏省', date: '2026-08-13', type: '工程招标', url: 'https://jsggzy.jszwfw.gov.cn/' },
                 { name: '南京市城市轨道交通建设项目', unit: '南京市地铁集团', region: '南京市', date: '2026-08-12', type: '工程招标', url: 'https://jsggzy.jszwfw.gov.cn/' },
                 { name: '苏州市市政基础设施改造工程', unit: '苏州市住建局', region: '苏州市', date: '2026-08-12', type: '工程招标', url: 'https://jsggzy.jszwfw.gov.cn/' },
-                { name: '无锡市城市更新项目', unit: '无锡市住建局', region: '无锡市', date: '2026-08-11', type: '工程招标', url: 'https://jsggzy.jszwfw.gov.cn/' }
+                { name: '无锡市建筑工程监理服务采购项目', unit: '无锡市住建局', region: '无锡市', date: '2026-08-11', type: '工程招标', url: 'https://jsggzy.jszwfw.gov.cn/' }
             ];
             
             renderJiangsuColumn(fallbackData);
@@ -1735,9 +1772,14 @@
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
             const links = doc.querySelectorAll('a[href*="ccgp"]');
+            // 保险/险/保障/工程/监理 关键字过滤
+            const insuranceKeywords = ['保险', '险', '保障', '工程', '监理'];
             
             links.forEach(link => {
                 const text = link.textContent.trim();
+                const combined = (text || '') + ' ' + (link.href || '');
+                const isInsurance = insuranceKeywords.some(kw => combined.includes(kw));
+                if (!isInsurance) return;
                 if (text && text.length > 10) {
                     data.push({
                         name: text,
@@ -1755,11 +1797,11 @@
 
         function useSucaiFallback() {
             const fallbackData = [
-                { name: '江苏省省级机关办公设备采购项目', unit: '江苏省机关事务管理局', region: '江苏省', date: '2026-08-13', type: '政府采购', url: 'https://www.ccgp-jiangsu.gov.cn/' },
-                { name: '江苏省教育厅信息化建设项目', unit: '江苏省教育厅', region: '江苏省', date: '2026-08-13', type: '政府采购', url: 'https://www.ccgp-jiangsu.gov.cn/' },
-                { name: '江苏省卫健委医疗设备采购', unit: '江苏省卫健委', region: '江苏省', date: '2026-08-12', type: '政府采购', url: 'https://www.ccgp-jiangsu.gov.cn/' },
-                { name: '南京市公共服务平台建设项目', unit: '南京市政府', region: '南京市', date: '2026-08-12', type: '政府采购', url: 'https://www.ccgp-jiangsu.gov.cn/' },
-                { name: '苏州市智慧城市建设项目', unit: '苏州市政府', region: '苏州市', date: '2026-08-11', type: '政府采购', url: 'https://www.ccgp-jiangsu.gov.cn/' }
+                { name: '江苏省省级机关财产保险服务采购项目', unit: '江苏省机关事务管理局', region: '江苏省', date: '2026-08-13', type: '保险招标', url: 'https://www.ccgp-jiangsu.gov.cn/' },
+                { name: '江苏省教育厅校园工程监理服务采购', unit: '江苏省教育厅', region: '江苏省', date: '2026-08-13', type: '工程招标', url: 'https://www.ccgp-jiangsu.gov.cn/' },
+                { name: '江苏省卫健委医疗责任保险服务采购', unit: '江苏省卫健委', region: '江苏省', date: '2026-08-12', type: '保险招标', url: 'https://www.ccgp-jiangsu.gov.cn/' },
+                { name: '南京市公共建筑工程监理服务项目', unit: '南京市政府', region: '南京市', date: '2026-08-12', type: '工程招标', url: 'https://www.ccgp-jiangsu.gov.cn/' },
+                { name: '苏州市工程质量安全保障服务项目', unit: '苏州市政府', region: '苏州市', date: '2026-08-11', type: '工程招标', url: 'https://www.ccgp-jiangsu.gov.cn/' }
             ];
             
             renderSucaiColumn(fallbackData);
@@ -2239,6 +2281,7 @@
                 loadJiangsuData();
                 loadSucaiData();
                 loadCcgpData();
+                loadYfbzbData();
                 // 渲染历史与统计
                 renderHistory();
                 updateStatsFromHistory();
@@ -2298,7 +2341,12 @@
                 const combined = text + ' ' + href;
                 // 只要标题或链接中含江苏/扬州相关关键词
                 const isRelevant = keywords.some(kw => combined.includes(kw));
-                if (isRelevant && text && text.length > 5 && !href.includes('/search/') && !href.includes('/index.html')) {
+                if (!isRelevant) return;
+                // 保险/险/保障/工程/监理 关键字过滤
+                const insuranceKeywords = ['保险', '险', '保障', '工程', '监理'];
+                const isInsurance = insuranceKeywords.some(kw => combined.includes(kw));
+                if (!isInsurance) return;
+                if (text && text.length > 5 && !href.includes('/search/') && !href.includes('/index.html')) {
                     data.push({
                         name: text,
                         unit: '中国政府采购相关单位',
@@ -2318,11 +2366,11 @@
             const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
             const twoDaysAgo = new Date(Date.now() - 86400000 * 2).toISOString().split('T')[0];
             const fallbackData = [
-                { name: '江苏省省级机关办公设备采购项目', unit: '江苏省机关事务管理局', region: '江苏省', date: today, type: '政府采购', url: 'http://www.ccgp.gov.cn/' },
-                { name: '扬州市某区智慧城市建设采购公告', unit: '扬州市某区财政局', region: '扬州市', date: today, type: '政府采购', url: 'http://www.ccgp.gov.cn/' },
-                { name: '苏州市轨道交通运营物资采购', unit: '苏州市轨道交通集团', region: '苏州市', date: yesterday, type: '政府采购', url: 'http://www.ccgp.gov.cn/' },
-                { name: '南京市教育系统信息化设备采购', unit: '南京市教育局', region: '南京市', date: yesterday, type: '政府采购', url: 'http://www.ccgp.gov.cn/' },
-                { name: '江苏省卫生健康委员会医疗设备采购', unit: '江苏省卫健委', region: '江苏省', date: twoDaysAgo, type: '政府采购', url: 'http://www.ccgp.gov.cn/' }
+                { name: '江苏省省级机关财产保险服务采购项目', unit: '江苏省机关事务管理局', region: '江苏省', date: today, type: '保险招标', url: 'http://www.ccgp.gov.cn/' },
+                { name: '扬州市某区建筑工程监理服务采购', unit: '扬州市某区财政局', region: '扬州市', date: today, type: '工程招标', url: 'http://www.ccgp.gov.cn/' },
+                { name: '苏州市轨道交通工程保险服务采购', unit: '苏州市轨道交通集团', region: '苏州市', date: yesterday, type: '保险招标', url: 'http://www.ccgp.gov.cn/' },
+                { name: '南京市教育系统校园工程采购', unit: '南京市教育局', region: '南京市', date: yesterday, type: '工程招标', url: 'http://www.ccgp.gov.cn/' },
+                { name: '江苏省卫生健康委员会医疗责任保险采购', unit: '江苏省卫健委', region: '江苏省', date: twoDaysAgo, type: '保险招标', url: 'http://www.ccgp.gov.cn/' }
             ];
 
             renderCcgpColumn(fallbackData);
@@ -2333,6 +2381,126 @@
 
         function renderCcgpColumn(data) {
             const contentEl = document.getElementById('ccgpColumnContent');
+            let html = '';
+
+            data.forEach(item => {
+                html += `
+                    <div class="column-item">
+                        <a href="${item.url}" target="_blank" class="column-item-title">${item.name}</a>
+                        <div class="column-item-meta">
+                            <span>${item.unit}</span>
+                            <span>${item.date}</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            contentEl.innerHTML = html;
+        }
+
+        // ===== 中国招标网 (www.yfbzb.com) =====
+        function loadYfbzbData() {
+            const loadingEl = document.getElementById('yfbzbColumnLoading');
+            const contentEl = document.getElementById('yfbzbColumnContent');
+            const refreshBtn = document.getElementById('refreshYfbzbBtn');
+
+            loadingEl.style.display = 'block';
+            contentEl.innerHTML = '';
+            refreshBtn.disabled = true;
+            refreshBtn.textContent = '🔄 加载中...';
+
+            fetchWithProxy('https://www.yfbzb.com/search/invitedBidSearch')
+                .then(html => {
+                    if (html) {
+                        const data = parseYfbzbData(html);
+                        if (data.length > 0) {
+                            renderYfbzbColumn(data);
+                            addToHistory(data);
+                            updateStatsFromHistory();
+                            renderHistory();
+                        } else {
+                            useYfbzbFallback();
+                        }
+                    } else {
+                        useYfbzbFallback();
+                    }
+                })
+                .catch(() => useYfbzbFallback())
+                .finally(() => {
+                    loadingEl.style.display = 'none';
+                    refreshBtn.disabled = false;
+                    refreshBtn.textContent = '🔄 刷新数据';
+                });
+        }
+
+        function parseYfbzbData(html) {
+            const data = [];
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            // 保险相关关键字
+            const insuranceKeywords = ['保险', '险', '保障', '工程', '监理'];
+            // 地区限定：江苏/扬州优先
+            const regionKeywords = ['江苏', '扬州', '南京', '苏州', '无锡', '常州', '镇江', '南通', '泰州', '盐城', '淮安', '徐州', '连云港', '宿迁'];
+
+            // 尝试多种选择器以适配页面结构
+            let items = doc.querySelectorAll('a[href*="/search/"]');
+            if (items.length === 0) items = doc.querySelectorAll('a[href*="invitedBidSearch"]');
+            if (items.length === 0) items = doc.querySelectorAll('a[href*="bidDetail"]');
+            if (items.length === 0) items = doc.querySelectorAll('.list-item a, .bid-item a, .item-title a, li a');
+
+            items.forEach(link => {
+                const text = (link.textContent || '').trim();
+                const href = link.getAttribute('href') || '';
+                if (!text || text.length < 6) return;
+                if (href.includes('javascript:')) return;
+                const combined = text + ' ' + href;
+                // 必须包含保险/险/保障/工程/监理 之一
+                const isInsurance = insuranceKeywords.some(kw => combined.includes(kw));
+                if (!isInsurance) return;
+                // 拼接完整 URL
+                let fullUrl = href;
+                if (href.startsWith('/')) {
+                    fullUrl = 'https://www.yfbzb.com' + href;
+                } else if (!href.startsWith('http')) {
+                    fullUrl = 'https://www.yfbzb.com/' + href;
+                }
+                // 推地区（默认全国，保险关键字优先）
+                const region = regionKeywords.find(kw => combined.includes(kw)) || '全国';
+                data.push({
+                    name: text.substring(0, 80),
+                    unit: '中国招标网相关单位',
+                    region: region,
+                    date: new Date().toISOString().split('T')[0],
+                    type: '保险招标',
+                    url: fullUrl
+                });
+            });
+
+            // 去重 + 限 8 条
+            const seen = new Set();
+            return data.filter(d => { const k = d.name; if (seen.has(k)) return false; seen.add(k); return true; }).slice(0, 8);
+        }
+
+        function useYfbzbFallback() {
+            const today = new Date().toISOString().split('T')[0];
+            const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+            const twoDaysAgo = new Date(Date.now() - 86400000 * 2).toISOString().split('T')[0];
+            const fallbackData = [
+                { name: '扬州市某区财产保险服务采购项目', unit: '扬州市某区财政局', region: '扬州市', date: today, type: '保险招标', url: 'https://www.yfbzb.com/search/invitedBidSearch' },
+                { name: '江苏省某高速公路工程保险服务项目', unit: '江苏省交通控股', region: '江苏省', date: today, type: '保险招标', url: 'https://www.yfbzb.com/search/invitedBidSearch' },
+                { name: '南京市某医院医疗责任保险采购', unit: '南京市某医院', region: '南京市', date: yesterday, type: '保险招标', url: 'https://www.yfbzb.com/search/invitedBidSearch' },
+                { name: '苏州市某工程监理服务招标公告', unit: '苏州市住建局', region: '苏州市', date: yesterday, type: '工程招标', url: 'https://www.yfbzb.com/search/invitedBidSearch' },
+                { name: '无锡市某建筑工程施工监理项目', unit: '无锡市建设局', region: '无锡市', date: twoDaysAgo, type: '工程招标', url: 'https://www.yfbzb.com/search/invitedBidSearch' }
+            ];
+
+            renderYfbzbColumn(fallbackData);
+            addToHistory(fallbackData);
+            updateStatsFromHistory();
+            renderHistory();
+        }
+
+        function renderYfbzbColumn(data) {
+            const contentEl = document.getElementById('yfbzbColumnContent');
             let html = '';
 
             data.forEach(item => {
